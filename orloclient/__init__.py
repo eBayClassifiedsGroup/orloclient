@@ -50,13 +50,15 @@ class Orlo(object):
         Fetch releases from the orlo API, optionally filtering
 
         http://orlo.readthedocs.org/en/latest/rest.html#get--releases
+        :param release_id:
+        :param kwargs: Filters to apply
         """
         self.logger.debug("Entering get_releases")
 
         if release_id:
-            "{url}/{id}".format(url=self.uri, id=release_id)
+            url = "{url}/releases/{id}".format(url=self.uri, id=release_id)
         else:
-            url = self.uri
+            url = "{url}/releases".format(url=self.uri)
 
         filters = []
 
@@ -70,24 +72,34 @@ class Orlo(object):
                 self.logger.debug("Append filter {}".format(f))
                 filters.append(f)
 
+        if filters:
+            url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
+
         response = requests.get(url, headers=self.headers)
+        self.logger.debug(response)
         return response.json()
 
-    def create_release(self, user, team, platforms,
+    def create_release(self, user, platforms,
+                       team=None,
                        references=None,
                        note=None,
                        ):
         """
         Create a release using the REST API
+        :param string user: User performing the release
+        :param array platforms: List of strings, platforms being released to
+        :param string team: Team responsible for the release
+        :param array references: List of strings, external references, e.g. Jira ticket
+        :param string note: Free-text field for additional information
         """
 
         data = {
-            'team': team,
+            'platforms': platforms,
             'user': user,
         }
 
-        if platforms:
-            data['platforms'] = platforms
+        if team:
+            data['team'] = team
         if references:
             data['references'] = references
         if note:
@@ -98,6 +110,7 @@ class Orlo(object):
             headers=self.headers,
             json=data,
         )
+        self.logger.debug(response)
         release_id = response.json()['id']
         return uuid.UUID(release_id)
 
@@ -105,9 +118,9 @@ class Orlo(object):
         """
         Create a package using the REST API
 
-        :param release_id: release id to create the package for
-        :param name:
-        :param version:
+        :param string release_id: release id to create the package for
+        :param string name: Name of the package
+        :param string version: Version of the package
         :return: package id
         """
 
@@ -119,19 +132,23 @@ class Orlo(object):
                 'version': version,
             },
         )
+        self.logger.debug(response)
         id = response.json()['id']
         return uuid.UUID(id)
 
     @staticmethod
-    def start_release():
+    def release_start():
         """
         Releases are automatically started when they are created
         """
         pass
 
-    def stop_release(self, release_id):
+    def release_stop(self, release_id):
         """
         Stop a release using the REST API
+
+        :param uuid.UUID release_id: Release UUID
+        :returns boolean: Whether or not the release was successfully stopped
         """
         response = requests.post(
             '{}/releases/{}/stop'.format(self.uri, release_id),
@@ -139,18 +156,19 @@ class Orlo(object):
         )
 
         if response.status_code != 204:
+            self.logger.debug(response)
             raise OrloServerError(
                 "Orlo server returned non-204 status code: {}".format(response.json()))
 
         return True
 
-    def start_package(self, release_id, package_id):
+    def package_start(self, release_id, package_id):
         """
         Start a package using the REST API
 
-        :param release_id: Release UUID
-        :param package_id: Package UUID
-        :return:
+        :param uuid.UUID release_id: Release UUID
+        :param uuid.UUID package_id: Package UUID
+        :return boolean: Whether or not the package was successfully started
         """
 
         response = requests.post(
@@ -160,18 +178,21 @@ class Orlo(object):
         )
 
         if response.status_code != 204:
+            self.logger.debug(response)
             raise OrloServerError(
                 "Orlo server returned non-204 status code: {}".format(response.json()))
 
         return True
 
-    def stop_package(self, release_id, package_id,
+    def package_stop(self, release_id, package_id,
                      success=True):
         """
         Start a package using the REST API
 
-        :param release_id:
-        :return:
+        :param uuid.UUID release_id: Release UUID
+        :param uuid.UUID package_id: Package UUID
+        :param boolean success: Whether or not the package was successfully stopped
+        :return boolean: Whether or not the package was successfully stopped
         """
 
         response = requests.post(
@@ -184,6 +205,7 @@ class Orlo(object):
         )
 
         if response.status_code != 204:
+            self.logger.debug(response)
             raise OrloServerError(
                 "Orlo server returned non-204 status code: {}".format(response.json()))
         return True
