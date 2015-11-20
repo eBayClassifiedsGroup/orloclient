@@ -34,12 +34,13 @@ class Orlo(object):
         'Content-Type': 'application/json',
     }
 
-    def __init__(self, uri):
+    def __init__(self, uri, requests_verify=True):
         self.logger = logging.getLogger(__name__)
         self.uri = uri
+        self.requests_verify = requests_verify
 
     def ping(self):
-        response = requests.get(self.uri + '/ping')
+        response = requests.get(self.uri + '/ping', verify=self.requests_verify)
         if response.status_code == 200:
             return True
         else:
@@ -75,7 +76,7 @@ class Orlo(object):
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
 
-        response = requests.get(url, headers=self.headers)
+        response = requests.get(url, headers=self.headers, verify=self.requests_verify)
         self.logger.debug(response)
         return response.json()
 
@@ -109,6 +110,7 @@ class Orlo(object):
             '{}/releases'.format(self.uri),
             headers=self.headers,
             json=data,
+            verify=self.requests_verify,
         )
         self.logger.debug(response)
         release_id = response.json()['id']
@@ -131,6 +133,7 @@ class Orlo(object):
                 'name': name,
                 'version': version,
             },
+            verify=self.requests_verify,
         )
         self.logger.debug(response)
         id = response.json()['id']
@@ -153,6 +156,7 @@ class Orlo(object):
         response = requests.post(
             '{}/releases/{}/stop'.format(self.uri, release_id),
             headers=self.headers,
+            verify=self.requests_verify,
         )
 
         if response.status_code != 204:
@@ -175,6 +179,7 @@ class Orlo(object):
             '{}/releases/{}/packages/{}/start'.format(
                 self.uri, release_id, package_id),
             headers=self.headers,
+            verify=self.requests_verify,
         )
 
         if response.status_code != 204:
@@ -202,6 +207,7 @@ class Orlo(object):
                 'success': success,
             },
             headers=self.headers,
+            verify=self.requests_verify,
         )
 
         if response.status_code != 204:
