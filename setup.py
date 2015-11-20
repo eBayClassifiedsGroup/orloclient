@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+import os
 
 __author__ = 'alforbes'
 
@@ -9,21 +10,21 @@ import multiprocessing  # nopep8
 
 setup(
     name='orloclient',
-    version='0.0.1',
+    version='0.0.1-4',
     description='Client to the Orlo deployment data capture API',
     author='Alex Forbes',
     author_email='alforbes@ebay.com',
     license='GPL',
-    long_description=open('README.md').read(),
+    long_description=open(os.path.join(os.getcwd(), 'README.md')).read(),
     url='https://github.com/eBayClassifiedsGroup/orloclient',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-      'requests',
+        'requests',
     ],
     tests_require=[
-      'Flask-Testing',
-      'orlo',
+        'Flask-Testing',
+        'orlo',
     ],
     test_suite='tests',
 )
