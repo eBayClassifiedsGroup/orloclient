@@ -88,9 +88,9 @@ class Orlo(object):
         """
         Create a release using the REST API
         :param string user: User performing the release
-        :param array platforms: List of strings, platforms being released to
+        :param list platforms: List of strings, platforms being released to
         :param string team: Team responsible for the release
-        :param array references: List of strings, external references, e.g. Jira ticket
+        :param list references: List of strings, external references, e.g. Jira ticket
         :param string note: Free-text field for additional information
         """
 
@@ -136,8 +136,8 @@ class Orlo(object):
             verify=self.requests_verify,
         )
         self.logger.debug(response)
-        id = response.json()['id']
-        return uuid.UUID(id)
+        package_id = response.json()['id']
+        return uuid.UUID(package_id)
 
     @staticmethod
     def release_start():
