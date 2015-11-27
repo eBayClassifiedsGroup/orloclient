@@ -11,7 +11,8 @@ class OrloLiveServerTest(LiveServerTestCase):
     """
     Test the Orlo client against the Orlo server
 
-    When this gets more complex it will make sense to create a mock
+    This is testing integration with the Orlo server, for tests that limit the scope to
+    the client code see test_orloclient.py
     """
 
     def create_app(self):
@@ -69,7 +70,6 @@ class OrloWriteTest(OrloLiveServerTest):
         Create a release
         """
         result = self._create_release()
-
         self.assertIsInstance(result, uuid.UUID)
 
     def test_create_package(self):
@@ -78,7 +78,6 @@ class OrloWriteTest(OrloLiveServerTest):
         """
         release_id = self._create_release()
         result = self._create_package(release_id)
-
         self.assertIsInstance(result, uuid.UUID)
 
     def test_package_start(self):
@@ -108,7 +107,6 @@ class OrloWriteTest(OrloLiveServerTest):
         """
         release_id = self._create_release()
         result = self._release_stop(release_id)
-
         self.assertTrue(result)
 
 
@@ -118,6 +116,9 @@ class OrloReadTest(OrloLiveServerTest):
     """
 
     def _setup_release(self):
+        """
+        Setup a complete release to test against
+        """
         self.release_id = self._create_release()
         self.package_id = self._create_package(self.release_id)
         self._package_start(self.release_id, self.package_id)
@@ -128,7 +129,6 @@ class OrloReadTest(OrloLiveServerTest):
         """
         Test that get_releases returns successfully without a filter
         """
-
         self._setup_release()
         result = self.orlo_client.get_releases()
         self.assertIsInstance(result, dict)
@@ -137,7 +137,6 @@ class OrloReadTest(OrloLiveServerTest):
         """
         Test get_releases with a filter on package_name
         """
-
         self._setup_release()
         result = self.orlo_client.get_releases(package_name='testName')
         self.assertIsInstance(result, dict)
@@ -152,7 +151,7 @@ class OrloReadTest(OrloLiveServerTest):
 
     def test_get_releases_empty(self):
         """
-        Test it doesn't blow up when filters don't match
+        Test it doesn't blow up when there are no releases
         """
         result = self.orlo_client.get_releases()
         self.assertIsInstance(result, dict)
