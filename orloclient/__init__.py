@@ -17,6 +17,7 @@ RELEASE_FILTERS = (
     "duration_less",
     "duration_greater",
     "team",
+    "rollback",
 )
 
 PACKAGE_FILTERS = (

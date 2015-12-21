@@ -10,7 +10,7 @@ import multiprocessing  # nopep8
 
 setup(
     name='orloclient',
-    version='0.0.3',
+    version='0.0.3-1',
     description='Client to the Orlo deployment data capture API',
     author='Alex Forbes',
     author_email='alforbes@ebay.com',
@@ -25,7 +25,7 @@ setup(
     tests_require=[
         'Flask-Testing',
         'httpretty',
-        'orlo',
+        'orlo >= 0.0.4',
     ],
     test_suite='tests',
 )
