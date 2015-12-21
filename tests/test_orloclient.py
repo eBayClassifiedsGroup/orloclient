@@ -4,6 +4,7 @@ import json
 import uuid
 from unittest import TestCase
 from orloclient import Orlo
+from orloclient import OrloClientError, OrloServerError
 
 __author__ = 'alforbes'
 
@@ -253,3 +254,36 @@ class WorkflowTest(OrloClientTest):
 
         body = json.loads(httpretty.last_request().body)
         self.assertEqual(False, body['success'])
+
+
+class ErrorTest(OrloClientTest):
+    """
+    Test error conditions
+    """
+
+    @httpretty.activate
+    def test_error_404(self):
+        """
+        Test that an OrloClient error is raised on 404
+        """
+
+        httpretty.register_uri(
+            httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE_ID),
+            status=404,
+            content_type='application/json',
+        )
+        self.assertRaises(OrloClientError, self.orlo.get_releases, self.RELEASE_ID)
+
+    @httpretty.activate
+    def test_error_invalid_json(self):
+        """
+        Test that we return the appropriate error when we get invalid json
+        """
+
+        httpretty.register_uri(
+            httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE_ID),
+            status=200,
+            body='{"foo": "bar"} this is not valid json',
+        )
+        self.assertRaises(OrloClientError, self.orlo.get_releases, self.RELEASE_ID)
+

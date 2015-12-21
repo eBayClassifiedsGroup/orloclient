@@ -26,14 +26,41 @@ PACKAGE_FILTERS = (
 )
 
 
+def _expect_200_response(response, status_code=200):
+    """
+    Check for an appropriate status code
+
+    :param response response: Requests library response object
+    :param int status_code: The expected status_code
+    :return:
+    """
+
+    if response.status_code == 204:
+        return True
+
+    if response.status_code == status_code:
+        try:
+            return response.json()
+        except ValueError:
+            raise OrloClientError("Could not decode json from Orlo response:\n{}".format(
+                str(response.text)
+            ))
+
+    msg = "Orlo server returned code {code}:\n{text}".format(
+            code=response.status_code, text=response.text)
+
+    if response.status_code > 500:
+        raise OrloServerError(msg)
+    else:
+        raise OrloClientError(msg)
+
+
 class Orlo(object):
     """
     Reference object to our Orlo server
     """
 
-    headers = {
-        'Content-Type': 'application/json',
-    }
+    headers = {'Content-Type': 'application/json'}
 
     def __init__(self, uri, requests_verify=True):
         self.logger = logging.getLogger(__name__)
@@ -42,6 +69,7 @@ class Orlo(object):
 
     def ping(self):
         response = requests.get(self.uri + '/ping', verify=self.requests_verify)
+
         if response.status_code == 200:
             return True
         else:
@@ -67,7 +95,7 @@ class Orlo(object):
         for key in kwargs:
             if key not in RELEASE_FILTERS:
                 raise OrloClientError("Invalid filter '{}' specified".format(
-                    key, kwargs[key]
+                        key, kwargs[key]
                 ))
             else:
                 f = "{}={}".format(key, kwargs[key])
@@ -79,7 +107,7 @@ class Orlo(object):
 
         response = requests.get(url, headers=self.headers, verify=self.requests_verify)
         self.logger.debug(response)
-        return response.json()
+        return _expect_200_response(response)
 
     def create_release(self, user, platforms,
                        team=None,
@@ -108,10 +136,10 @@ class Orlo(object):
             data['note'] = note
 
         response = requests.post(
-            '{}/releases'.format(self.uri),
-            headers=self.headers,
-            json=data,
-            verify=self.requests_verify,
+                '{}/releases'.format(self.uri),
+                headers=self.headers,
+                json=data,
+                verify=self.requests_verify,
         )
         self.logger.debug(response)
         release_id = response.json()['id']
@@ -128,13 +156,13 @@ class Orlo(object):
         """
 
         response = requests.post(
-            '{}/releases/{}/packages'.format(self.uri, release_id),
-            headers=self.headers,
-            json={
-                'name': name,
-                'version': version,
-            },
-            verify=self.requests_verify,
+                '{}/releases/{}/packages'.format(self.uri, release_id),
+                headers=self.headers,
+                json={
+                    'name': name,
+                    'version': version,
+                },
+                verify=self.requests_verify,
         )
         self.logger.debug(response)
         package_id = response.json()['id']
@@ -155,17 +183,12 @@ class Orlo(object):
         :returns boolean: Whether or not the release was successfully stopped
         """
         response = requests.post(
-            '{}/releases/{}/stop'.format(self.uri, release_id),
-            headers=self.headers,
-            verify=self.requests_verify,
+                '{}/releases/{}/stop'.format(self.uri, release_id),
+                headers=self.headers,
+                verify=self.requests_verify,
         )
 
-        if response.status_code != 204:
-            self.logger.debug(response)
-            raise OrloServerError(
-                "Orlo server returned non-204 status code: {}".format(response.json()))
-
-        return True
+        return _expect_200_response(response, status_code=204)
 
     def package_start(self, release_id, package_id):
         """
@@ -177,18 +200,18 @@ class Orlo(object):
         """
 
         response = requests.post(
-            '{}/releases/{}/packages/{}/start'.format(
-                self.uri, release_id, package_id),
-            headers=self.headers,
-            verify=self.requests_verify,
+                '{}/releases/{}/packages/{}/start'.format(
+                        self.uri, release_id, package_id),
+                headers=self.headers,
+                verify=self.requests_verify,
         )
 
         if response.status_code != 204:
             self.logger.debug(response)
             raise OrloServerError(
-                "Orlo server returned non-204 status code: {}".format(response.json()))
+                    "Orlo server returned non-204 status code: {}".format(response.json()))
 
-        return True
+        return _expect_200_response(response, status_code=204)
 
     def package_stop(self, release_id, package_id,
                      success=True):
@@ -202,18 +225,13 @@ class Orlo(object):
         """
 
         response = requests.post(
-            '{}/releases/{}/packages/{}/stop'.format(
-                self.uri, release_id, package_id),
-            json={
-                'success': success,
-            },
-            headers=self.headers,
-            verify=self.requests_verify,
+                '{}/releases/{}/packages/{}/stop'.format(
+                        self.uri, release_id, package_id),
+                json={
+                    'success': success,
+                },
+                headers=self.headers,
+                verify=self.requests_verify,
         )
 
-        if response.status_code != 204:
-            self.logger.debug(response)
-            raise OrloServerError(
-                "Orlo server returned non-204 status code: {}".format(response.json()))
-        return True
-
+        return _expect_200_response(response, status_code=204)

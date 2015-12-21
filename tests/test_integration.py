@@ -164,3 +164,4 @@ class OrloReadTest(OrloLiveServerTest):
         result = self.orlo_client.get_releases(user='doesNotExist')
         self.assertIsInstance(result, dict)
         self.assertEqual(0, len(result['releases']))
+
