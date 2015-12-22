@@ -17,7 +17,15 @@ RELEASE_FILTERS = (
     "duration_less",
     "duration_greater",
     "team",
-    "rollback",
+    "duration_lt",
+    "duration_gt",
+    "package_rollback",
+    "package_name",
+    "package_version",
+    "package_duration_lt",
+    "package_duration_gt",
+    "package_status",
+    "latest",
 )
 
 PACKAGE_FILTERS = (
