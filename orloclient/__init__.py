@@ -26,6 +26,7 @@ RELEASE_FILTERS = (
     "package_duration_gt",
     "package_status",
     "latest",
+    "status",
 )
 
 PACKAGE_FILTERS = (
