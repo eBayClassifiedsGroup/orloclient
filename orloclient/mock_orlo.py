@@ -5,7 +5,7 @@ import uuid
 __author__ = 'alforbes'
 
 """
-A very simple Mock Orlo object for testing
+A very simple Mock Orlo object for testing in deployment scripts
 """
 
 

@@ -243,3 +243,57 @@ class Orlo(object):
         )
 
         return _expect_200_response(response, status_code=204)
+
+    def get_info(self, field, name=None, platform=None):
+        """
+        Fetch from the /info endpoint
+
+        Field is required, as /info just has links and isn't useful
+
+        :param field: The "field" (table?) we are looking at, i.e. user/team/package/platform
+        :param name: The subject, e.g the user name / team name / package name
+        :param platform: Filter by platform
+        :return:
+        """
+
+        url_path = {
+            'uri': self.uri,
+            'field': field if field else '',
+            'name': '/' + name if name else '',
+        }
+
+        url_query = {'platform': platform} if platform else {}
+
+        response = requests.get(
+            '{uri}/info/{field}{name}'.format(**url_path), params=url_query
+        )
+        return response.json()
+
+    def get_stats(self, field=None, name=None, platform=None, stime=None, ftime=None):
+        """
+        Fetch from the /stats endpoint
+
+        Field is optional, as /stats presents global stats
+
+        :param field: The "field" (table?) we are looking at, i.e. user/team/package/platform
+        :param name: The subject, e.g the user name / team name / package name
+        :param platform: Filter by platform
+        :param stime: Lower-bound start time filter
+        :param ftime: Upper-bound start time filter
+        :return:
+        """
+
+        url_path = {
+            'uri': self.uri,
+            'field': '/' + field if field else '',
+            'name': '/' + name if name else '',
+        }
+
+        url_query = {}
+        for var in ['platform', 'stime', 'ftime']:
+            url_query[var] = eval(var)
+
+        response = requests.get(
+            '{uri}/stats{field}{name}'.format(**url_path), params=url_query
+        )
+        return response.json()
