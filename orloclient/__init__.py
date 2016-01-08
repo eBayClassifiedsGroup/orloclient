@@ -7,6 +7,7 @@ import requests
 import uuid
 
 RELEASE_FILTERS = (
+    "desc",
     "duration_gt",
     "duration_lt",
     "ftime_after",
