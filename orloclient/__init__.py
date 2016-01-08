@@ -7,14 +7,13 @@ import requests
 import uuid
 
 RELEASE_FILTERS = (
-    "duration_greater",
     "duration_gt",
-    "duration_less",
     "duration_lt",
     "ftime_after",
     "ftime_before",
     "latest",
     "limit",
+    "offset",
     "package_duration_gt",
     "package_duration_lt",
     "package_name",
