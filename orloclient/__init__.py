@@ -7,26 +7,27 @@ import requests
 import uuid
 
 RELEASE_FILTERS = (
-    "package_name",
-    "user",
-    "platform",
-    "stime_before",
-    "stime_after",
-    "ftime_before",
-    "ftime_after",
-    "duration_less",
     "duration_greater",
-    "team",
-    "duration_lt",
     "duration_gt",
-    "package_rollback",
-    "package_name",
-    "package_version",
-    "package_duration_lt",
-    "package_duration_gt",
-    "package_status",
+    "duration_less",
+    "duration_lt",
+    "ftime_after",
+    "ftime_before",
     "latest",
+    "limit",
+    "package_duration_gt",
+    "package_duration_lt",
+    "package_name",
+    "package_name",
+    "package_rollback",
+    "package_status",
+    "package_version",
+    "platform",
     "status",
+    "stime_after",
+    "stime_before",
+    "team",
+    "user",
 )
 
 PACKAGE_FILTERS = (
@@ -145,10 +146,10 @@ class Orlo(object):
             data['note'] = note
 
         response = requests.post(
-                '{}/releases'.format(self.uri),
-                headers=self.headers,
-                json=data,
-                verify=self.requests_verify,
+            '{}/releases'.format(self.uri),
+            headers=self.headers,
+            json=data,
+            verify=self.requests_verify,
         )
         self.logger.debug(response)
         release_id = response.json()['id']
@@ -165,13 +166,13 @@ class Orlo(object):
         """
 
         response = requests.post(
-                '{}/releases/{}/packages'.format(self.uri, release_id),
-                headers=self.headers,
-                json={
-                    'name': name,
-                    'version': version,
-                },
-                verify=self.requests_verify,
+            '{}/releases/{}/packages'.format(self.uri, release_id),
+            headers=self.headers,
+            json={
+                'name': name,
+                'version': version,
+            },
+            verify=self.requests_verify,
         )
         self.logger.debug(response)
         package_id = response.json()['id']
@@ -192,9 +193,9 @@ class Orlo(object):
         :returns boolean: Whether or not the release was successfully stopped
         """
         response = requests.post(
-                '{}/releases/{}/stop'.format(self.uri, release_id),
-                headers=self.headers,
-                verify=self.requests_verify,
+            '{}/releases/{}/stop'.format(self.uri, release_id),
+            headers=self.headers,
+            verify=self.requests_verify,
         )
 
         return _expect_200_response(response, status_code=204)
@@ -209,10 +210,10 @@ class Orlo(object):
         """
 
         response = requests.post(
-                '{}/releases/{}/packages/{}/start'.format(
-                        self.uri, release_id, package_id),
-                headers=self.headers,
-                verify=self.requests_verify,
+            '{}/releases/{}/packages/{}/start'.format(
+                    self.uri, release_id, package_id),
+            headers=self.headers,
+            verify=self.requests_verify,
         )
 
         if response.status_code != 204:
@@ -234,13 +235,13 @@ class Orlo(object):
         """
 
         response = requests.post(
-                '{}/releases/{}/packages/{}/stop'.format(
-                        self.uri, release_id, package_id),
-                json={
-                    'success': success,
-                },
-                headers=self.headers,
-                verify=self.requests_verify,
+            '{}/releases/{}/packages/{}/stop'.format(
+                    self.uri, release_id, package_id),
+            json={
+                'success': success,
+            },
+            headers=self.headers,
+            verify=self.requests_verify,
         )
 
         return _expect_200_response(response, status_code=204)

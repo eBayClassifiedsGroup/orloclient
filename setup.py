@@ -10,7 +10,7 @@ import multiprocessing  # nopep8
 
 setup(
     name='orloclient',
-    version='0.0.4-2',
+    version='0.0.5-1',
     description='Client to the Orlo deployment data capture API',
     author='Alex Forbes',
     author_email='alforbes@ebay.com',
