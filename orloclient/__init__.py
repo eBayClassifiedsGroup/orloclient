@@ -6,35 +6,6 @@ import json
 import requests
 import uuid
 
-RELEASE_FILTERS = (
-    "desc",
-    "duration_gt",
-    "duration_lt",
-    "ftime_after",
-    "ftime_before",
-    "latest",
-    "limit",
-    "offset",
-    "package_duration_gt",
-    "package_duration_lt",
-    "package_name",
-    "package_name",
-    "package_rollback",
-    "package_status",
-    "package_version",
-    "platform",
-    "status",
-    "stime_after",
-    "stime_before",
-    "team",
-    "user",
-)
-
-PACKAGE_FILTERS = (
-    "name",
-    "version",
-)
-
 
 def _expect_200_response(response, status_code=200):
     """
@@ -72,13 +43,13 @@ class Orlo(object):
 
     headers = {'Content-Type': 'application/json'}
 
-    def __init__(self, uri, requests_verify=True):
+    def __init__(self, uri, verify_ssl=True):
         self.logger = logging.getLogger(__name__)
         self.uri = uri
-        self.requests_verify = requests_verify
+        self.verify_ssl = verify_ssl
 
     def ping(self):
-        response = requests.get(self.uri + '/ping', verify=self.requests_verify)
+        response = requests.get(self.uri + '/ping', verify=self.verify_ssl)
 
         if response.status_code == 200:
             return True
@@ -103,14 +74,9 @@ class Orlo(object):
         filters = []
 
         for key in kwargs:
-            if key not in RELEASE_FILTERS:
-                raise OrloClientError("Invalid filter '{}' specified".format(
-                        key, kwargs[key]
-                ))
-            else:
-                f = "{}={}".format(key, kwargs[key])
-                self.logger.debug("Append filter {}".format(f))
-                filters.append(f)
+            f = "{}={}".format(key, kwargs[key])
+            self.logger.debug("Append filter {}".format(f))
+            filters.append(f)
 
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
