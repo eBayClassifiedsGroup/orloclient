@@ -38,9 +38,9 @@ class MockOrlo(object):
         "user": "testuser"
     }
 
-    def __init__(self, uri, requests_verify=True):
+    def __init__(self, uri, verify_ssl=True):
         self.uri = uri
-        self.requests_verify = requests_verify
+        self.verify_ssl = verify_ssl
 
     @staticmethod
     def ping():

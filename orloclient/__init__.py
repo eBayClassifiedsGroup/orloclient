@@ -2,7 +2,6 @@ from __future__ import print_function
 from orloclient.config import config
 from orloclient.exceptions import OrloClientError, OrloServerError
 import logging
-import json
 import requests
 import uuid
 
@@ -81,7 +80,7 @@ class Orlo(object):
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
 
-        response = requests.get(url, headers=self.headers, verify=self.requests_verify)
+        response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
         self.logger.debug(response)
         return _expect_200_response(response)
 
@@ -115,7 +114,7 @@ class Orlo(object):
             '{}/releases'.format(self.uri),
             headers=self.headers,
             json=data,
-            verify=self.requests_verify,
+            verify=self.verify_ssl,
         )
         self.logger.debug(response)
         release_id = response.json()['id']
@@ -138,7 +137,7 @@ class Orlo(object):
                 'name': name,
                 'version': version,
             },
-            verify=self.requests_verify,
+            verify=self.verify_ssl,
         )
         self.logger.debug(response)
         package_id = response.json()['id']
@@ -161,7 +160,7 @@ class Orlo(object):
         response = requests.post(
             '{}/releases/{}/stop'.format(self.uri, release_id),
             headers=self.headers,
-            verify=self.requests_verify,
+            verify=self.verify_ssl,
         )
 
         return _expect_200_response(response, status_code=204)
@@ -179,7 +178,7 @@ class Orlo(object):
             '{}/releases/{}/packages/{}/start'.format(
                     self.uri, release_id, package_id),
             headers=self.headers,
-            verify=self.requests_verify,
+            verify=self.verify_ssl,
         )
 
         if response.status_code != 204:
@@ -207,7 +206,7 @@ class Orlo(object):
                 'success': success,
             },
             headers=self.headers,
-            verify=self.requests_verify,
+            verify=self.verify_ssl,
         )
 
         return _expect_200_response(response, status_code=204)
