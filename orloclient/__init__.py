@@ -110,13 +110,15 @@ class Orlo(object):
         if note:
             data['note'] = note
 
+        req_url = '{}/releases'.format(self.uri)
+        self.logger.debug("Posting to {}:\n{}".format(req_url, data))
         response = requests.post(
-            '{}/releases'.format(self.uri),
+            req_url,
             headers=self.headers,
             json=data,
             verify=self.verify_ssl,
         )
-        self.logger.debug(response)
+        self.logger.debug("Response {}:\n{}".format(response.status_code, response.text))
         release_id = response.json()['id']
         return uuid.UUID(release_id)
 
