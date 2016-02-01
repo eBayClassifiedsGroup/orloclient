@@ -66,16 +66,23 @@ class GetReleasesTest(OrloClientTest):
     @httpretty.activate
     def test_get_releases(self):
         """
-        Test getting all releases
+        Test getting releases
         """
         httpretty.register_uri(
-                httpretty.GET, '{}/releases'.format(self.URI, self.RELEASE_ID),
+                httpretty.GET, '{}/releases?foo=bar'.format(self.URI, self.RELEASE_ID),
                 body=self.DUMMY_JSON_S,
                 status=200,
         )
 
-        response = self.orlo.get_releases()
+        response = self.orlo.get_releases(foo='bar')
         self.assertEqual(response['message'], self.DUMMY_JSON['message'])
+
+    def test_get_releases_unfiltered_raises(self):
+        """
+        Test that get/releases without a filter raises OrloClientError
+        """
+        with self.assertRaises(OrloClientError):
+            self.orlo.get_releases()
 
     @httpretty.activate
     def test_get_releases_filter(self):

@@ -70,6 +70,10 @@ class Orlo(object):
         """
         self.logger.debug("Entering get_releases")
 
+        if not release_id and len(kwargs) is 0:
+            msg = "Must specify at least one filter for releases"
+            raise OrloClientError(msg)
+
         if release_id:
             url = "{url}/releases/{id}".format(url=self.uri, id=release_id)
         else:

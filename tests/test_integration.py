@@ -125,14 +125,6 @@ class OrloReadTest(OrloLiveServerTest):
         self._package_stop(self.release_id, self.package_id)
         self._release_stop(self.release_id)
 
-    def test_get_releases(self):
-        """
-        Test that get_releases returns successfully without a filter
-        """
-        self._setup_release()
-        result = self.orlo_client.get_releases()
-        self.assertIsInstance(result, dict)
-
     def test_get_releases_package_name(self):
         """
         Test get_releases with a filter on package_name
@@ -153,7 +145,7 @@ class OrloReadTest(OrloLiveServerTest):
         """
         Test it doesn't blow up when there are no releases
         """
-        result = self.orlo_client.get_releases()
+        result = self.orlo_client.get_releases(platform='test_platform')
         self.assertIsInstance(result, dict)
         self.assertEqual(0, len(result['releases']))
 
