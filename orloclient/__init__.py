@@ -6,35 +6,6 @@ import requests
 import uuid
 
 
-def _expect_200_response(response, status_code=200):
-    """
-    Check for an appropriate status code
-
-    :param response response: Requests library response object
-    :param int status_code: The expected status_code
-    :return:
-    """
-
-    if response.status_code == 204:
-        return True
-
-    if response.status_code == status_code:
-        try:
-            return response.json()
-        except ValueError:
-            raise OrloClientError("Could not decode json from Orlo response:\n{}".format(
-                str(response.text)
-            ))
-
-    msg = "Orlo server returned code {code}:\n{text}".format(
-            code=response.status_code, text=response.text)
-
-    if response.status_code > 500:
-        raise OrloServerError(msg)
-    else:
-        raise OrloClientError(msg)
-
-
 class Orlo(object):
     """
     Reference object to our Orlo server
@@ -46,6 +17,40 @@ class Orlo(object):
         self.logger = logging.getLogger(__name__)
         self.uri = uri
         self.verify_ssl = verify_ssl
+
+    def _expect_200_response(self, response, status_code=200):
+        """
+        Check for an appropriate status code
+
+        :param response response: Requests library response object
+        :param int status_code: The expected status_code
+        :return:
+        """
+        self.logger.debug("Response {}:\n{}".format(response.status_code, response.text))
+
+        if response.status_code == 204:
+            return True
+
+        if response.status_code == status_code:
+            try:
+                return response.json()
+            except ValueError:
+                raise OrloClientError("Could not decode json from Orlo response:\n{}".format(
+                        str(response.text)
+                ))
+
+        msg = "Orlo server returned code {code}:\n{text}".format(
+                code=response.status_code, text=response.text)
+
+        if response.status_code in (301, 302):
+            # Requests does not redo the post when receiving a redirect
+            # Thus, we use allow_redirect=False for POSTs which will result
+            # in the redirect appearing here
+            raise OrloServerError("Got redirect while attempting to POST")
+        elif response.status_code > 500:
+            raise OrloServerError(msg)
+        else:
+            raise OrloClientError(msg)
 
     def ping(self):
         response = requests.get(self.uri + '/ping', verify=self.verify_ssl)
@@ -82,7 +87,7 @@ class Orlo(object):
 
         response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
         self.logger.debug(response)
-        return _expect_200_response(response)
+        return self._expect_200_response(response)
 
     def create_release(self, user, platforms,
                        team=None,
@@ -117,8 +122,11 @@ class Orlo(object):
             headers=self.headers,
             json=data,
             verify=self.verify_ssl,
+            allow_redirects=False,
         )
-        self.logger.debug("Response {}:\n{}".format(response.status_code, response.text))
+
+        self._expect_200_response(response)
+
         release_id = response.json()['id']
         return uuid.UUID(release_id)
 
@@ -140,8 +148,11 @@ class Orlo(object):
                 'version': version,
             },
             verify=self.verify_ssl,
+            allow_redirects=False,
         )
-        self.logger.debug(response)
+
+        self._expect_200_response(response)
+
         package_id = response.json()['id']
         return uuid.UUID(package_id)
 
@@ -163,9 +174,10 @@ class Orlo(object):
             '{}/releases/{}/stop'.format(self.uri, release_id),
             headers=self.headers,
             verify=self.verify_ssl,
+            allow_redirects=False,
         )
 
-        return _expect_200_response(response, status_code=204)
+        return self._expect_200_response(response, status_code=204)
 
     def package_start(self, release_id, package_id):
         """
@@ -181,6 +193,7 @@ class Orlo(object):
                     self.uri, release_id, package_id),
             headers=self.headers,
             verify=self.verify_ssl,
+            allow_redirects=False,
         )
 
         if response.status_code != 204:
@@ -188,7 +201,7 @@ class Orlo(object):
             raise OrloServerError(
                     "Orlo server returned non-204 status code: {}".format(response.json()))
 
-        return _expect_200_response(response, status_code=204)
+        return self._expect_200_response(response, status_code=204)
 
     def package_stop(self, release_id, package_id,
                      success=True):
@@ -209,9 +222,10 @@ class Orlo(object):
             },
             headers=self.headers,
             verify=self.verify_ssl,
+            allow_redirects=False,
         )
 
-        return _expect_200_response(response, status_code=204)
+        return self._expect_200_response(response, status_code=204)
 
     def get_info(self, field, name=None, platform=None):
         """
