@@ -1,14 +1,20 @@
 from __future__ import print_function
-from orloclient.config import config
-from orloclient.exceptions import OrloClientError, OrloServerError
+from .config import config
+from .exceptions import OrloClientError, OrloServerError
+from .release import OrloRelease
+from .package import OrloPackage
 import logging
 import requests
 import uuid
 
 
-class Orlo(object):
+class OrloClient(object):
     """
     Reference object to our Orlo server
+
+    This object is intended to be a very thin layer to the actual http
+    calls, there is very little abstraction. See OrloRelease and OrloPackage
+    if you want more OO-like objects.
     """
 
     headers = {'Content-Type': 'application/json'}
@@ -284,3 +290,4 @@ class Orlo(object):
             '{uri}/stats{field}{name}'.format(**url_path), params=url_query
         )
         return response.json()
+

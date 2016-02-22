@@ -1,10 +1,8 @@
 from __future__ import print_function
 import httpretty
 import json
-import uuid
-from unittest import TestCase
-from orloclient import Orlo
 from orloclient import OrloClientError, OrloServerError
+from tests import OrloClientTest
 
 __author__ = 'alforbes'
 
@@ -16,23 +14,10 @@ integration with the orlo server
 '''
 
 
-class OrloClientTest(TestCase):
+class TestOrloBase(OrloClientTest):
     """
-    Parent method for Orlo client tests
-
-    Constants in this class are test parameters for Orlo methods
+    Base functionality
     """
-    NOTE = 'test note'
-    PACKAGE_ID = uuid.uuid4()
-    PLATFORMS = ['test_platform']
-    REFERENCES = ['test_reference']
-    RELEASE_ID = uuid.uuid4()
-    TEAM = 'test_team'
-    URI = 'http://localhost:1337'
-    USER = 'test_user'
-
-    def setUp(self):
-        self.orlo = Orlo(self.URI)
 
     @httpretty.activate
     def test_ping(self):
@@ -45,7 +30,7 @@ class OrloClientTest(TestCase):
         self.assertEqual(self.orlo.ping(), True)
 
 
-class GetReleasesTest(OrloClientTest):
+class TestGetReleases(OrloClientTest):
     DUMMY_JSON = {"message": "dummy json"}
     DUMMY_JSON_S = str(DUMMY_JSON).replace("'", '"')
 

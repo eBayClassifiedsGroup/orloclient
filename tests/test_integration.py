@@ -1,6 +1,6 @@
 from __future__ import print_function
 from flask.ext.testing import LiveServerTestCase
-from orloclient import Orlo
+from orloclient import OrloClient
 import orlo
 import uuid
 
@@ -29,7 +29,7 @@ class OrloLiveServerTest(LiveServerTestCase):
         return orlo.app
 
     def setUp(self):
-        self.orlo_client = Orlo(
+        self.orlo_client = OrloClient(
             uri='http://localhost:7767'
         )
 
