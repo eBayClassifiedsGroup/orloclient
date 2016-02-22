@@ -1,4 +1,5 @@
 from __future__ import print_function
+from orloclient import OrloClient
 import json
 import uuid
 
@@ -38,12 +39,30 @@ class MockOrlo(object):
         "user": "testuser"
     }
 
+    example_stats = {
+        "global": {
+            "releases": {
+                "normal": {
+                    "failed": 1,
+                    "successful": 10
+                },
+                "rollback": {
+                    "failed": 1,
+                    "successful": 2
+                },
+                "total": {
+                    "failed": 2,
+                    "successful": 12
+                }
+            }
+        }
+    }
+
     def __init__(self, uri, verify_ssl=True):
         self.uri = uri
         self.verify_ssl = verify_ssl
 
-    @staticmethod
-    def ping():
+    def ping(self):
         return True
 
     def get_releases(self, *args, **kwargs):
@@ -58,8 +77,13 @@ class MockOrlo(object):
     def create_package(self, *args, **kwargs):
         return uuid.UUID(self.example_package['id'])
 
-    @staticmethod
-    def release_stop(release_id):
+    def get_info(self, field, name=None, platform=None):
+        return {'foo': {'bar': 1}}
+
+    def get_stats(self, field=None, name=None, platform=None, stime=None, ftime=None):
+        return json.dumps(self.example_stats)
+
+    def release_stop(self, release_id):
         return True
 
     @staticmethod
