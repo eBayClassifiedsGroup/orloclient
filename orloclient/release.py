@@ -5,38 +5,32 @@ __author__ = 'alforbes'
 
 
 class OrloRelease(object):
-    def __init__(self, client, release_id=None, create=False, **kwargs):
+    def __init__(self, release_id, user, platforms,
+                 team=None,
+                 references=None,
+                 metadata=None,
+                 note=None):
         """
         An Orlo Release
 
-        :param client: Instance of orloclient.Orlo
-        :param release_id:
+        :param UUID release_id:
+        :param string user:
+        :param list platforms:
+        :param string team:
+        :param list references:
+        :param dict metadata:
+        :param string note:
         :return:
         """
-        if not release_id and not create:
-            raise OrloClientError("Must specify a release_id, or create must be True")
 
-        self.client = client
         self.release_id = release_id
-        self.kwargs = kwargs
+        self.user = user
+        self.platforms = platforms
+        self.team = team
+        self.references = references
+        self.metadata = metadata
+        self.note = note
+        self.packages = []
 
-    def create(self):
-        """
-        Create this release on the server
-        """
-        rid = self.client.create_release(
-            user=self.kwargs.get('user'),
-            platforms=self.kwargs.get('platforms'),
-            team=self.kwargs.get('team'),
-            references=self.kwargs.get('references'),
-            note=self.kwargs.get('references'),
-        )
-        return rid
-
-    def get(self):
-        """
-        Fetch this release from the server
-        :return:
-        """
-        release = self.client.get_releases(release_id=self.release_id)
-        print(release)
+    def deploy(self):
+        raise NotImplementedError("Coming soon")
