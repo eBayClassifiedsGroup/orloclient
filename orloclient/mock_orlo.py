@@ -10,9 +10,11 @@ A very simple Mock Orlo object for testing in deployment scripts
 """
 
 
-class MockOrlo(object):
+class MockOrloClient(object):
     """
-    Reference object to our Orlo server
+    A mock Orlo Client
+
+    Will return values from the example objects below.
     """
     example_package = {
         "status": "SUCCESSFUL",
@@ -36,7 +38,8 @@ class MockOrlo(object):
         "references": [],
         "packages": [example_package],
         "id": str(uuid.uuid4()),
-        "user": "testuser"
+        "user": "testuser",
+        "metadata": {"env": "test", "pool": "web"}
     }
 
     example_stats = {

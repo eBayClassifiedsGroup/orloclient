@@ -1,5 +1,5 @@
 from __future__ import print_function
-from orloclient.mock_orlo import MockOrlo
+from orloclient.mock_orlo import MockOrloClient
 from orloclient import OrloClient
 from unittest import TestCase
 import uuid
@@ -36,7 +36,7 @@ class TestMockOrlo(TestCase):
     functions = get_callables(OrloClient)
 
     def setUp(self):
-        self.mock_client = MockOrlo(uri='http://dummy')
+        self.mock_client = MockOrloClient(uri='http://dummy')
 
     def test_attributes(self):
         """

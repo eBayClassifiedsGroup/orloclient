@@ -1,8 +1,7 @@
 from __future__ import print_function
 from .config import config
 from .exceptions import OrloClientError, OrloServerError
-from .release import OrloRelease
-from .package import OrloPackage
+from .objects import Release, Package
 import logging
 import requests
 import uuid
