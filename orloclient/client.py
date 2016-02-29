@@ -1,7 +1,6 @@
 from __future__ import print_function
 import logging
 import requests
-import uuid
 
 from .exceptions import OrloClientError, OrloServerError
 from .objects import Release, Package
@@ -145,7 +144,7 @@ class OrloClient(object):
         """
         Create a package using the REST API
 
-        :param string release: release to create the package for
+        :param Release release: release to create the package for
         :param string name: Name of the package
         :param string version: Version of the package
         :return: package id
@@ -196,7 +195,7 @@ class OrloClient(object):
         """
         Start a package using the REST API
 
-        :param uuid.UUID package: Package object
+        :param Package package: Package object
         :return boolean: Whether or not the package was successfully started
         """
 
