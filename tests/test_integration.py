@@ -1,8 +1,8 @@
 from __future__ import print_function
 from flask.ext.testing import LiveServerTestCase
-from orloclient import OrloClient
+from orloclient import OrloClient, Release, Package
 import orlo
-import uuid
+
 
 __author__ = 'alforbes'
 
@@ -40,20 +40,20 @@ class OrloLiveServerTest(LiveServerTestCase):
     def _create_release(self):
         return self.orlo_client.create_release('testuser', 'testplatform')
 
-    def _create_package(self, release_id):
-        return self.orlo_client.create_package(release_id, 'testName', '1.2.3')
+    def _create_package(self, release):
+        return self.orlo_client.create_package(release, 'testName', '1.2.3')
 
-    def _package_start(self, release_id, package_id):
-        return self.orlo_client.package_start(release_id, package_id)
+    def _package_start(self, package):
+        return self.orlo_client.package_start(package)
 
-    def _package_stop(self, release_id, package_id, success=True):
-        return self.orlo_client.package_stop(release_id, package_id, success)
+    def _package_stop(self, package, success=True):
+        return self.orlo_client.package_stop(package, success)
 
-    def _release_stop(self, release_id):
-        return self.orlo_client.release_stop(release_id)
+    def _release_stop(self, release):
+        return self.orlo_client.release_stop(release)
 
 
-class OrloWriteTest(OrloLiveServerTest):
+class TestOrloWrite(OrloLiveServerTest):
     """
     Test the write functions
     """
@@ -69,8 +69,8 @@ class OrloWriteTest(OrloLiveServerTest):
         """
         Create a release
         """
-        result = self._create_release()
-        self.assertIsInstance(result, uuid.UUID)
+        release = self._create_release()
+        self.assertIsInstance(release, Release)
 
     def test_create_package(self):
         """
@@ -78,15 +78,15 @@ class OrloWriteTest(OrloLiveServerTest):
         """
         release_id = self._create_release()
         result = self._create_package(release_id)
-        self.assertIsInstance(result, uuid.UUID)
+        self.assertIsInstance(result, Package)
 
     def test_package_start(self):
         """
         Start a package
         """
-        release_id = self._create_release()
-        package_id = self._create_package(release_id)
-        result = self._package_start(release_id, package_id)
+        release = self._create_release()
+        package = self._create_package(release)
+        result = self._package_start(package)
 
         self.assertTrue(result)
 
@@ -94,10 +94,10 @@ class OrloWriteTest(OrloLiveServerTest):
         """
         Stop a package
         """
-        release_id = self._create_release()
-        package_id = self._create_package(release_id)
-        self._package_start(release_id, package_id)
-        result = self._package_stop(release_id, package_id)
+        release = self._create_release()
+        package = self._create_package(release)
+        self._package_start(package)
+        result = self._package_stop(package)
 
         self.assertTrue(result)
 
@@ -110,7 +110,7 @@ class OrloWriteTest(OrloLiveServerTest):
         self.assertTrue(result)
 
 
-class OrloReadTest(OrloLiveServerTest):
+class TestOrloRead(OrloLiveServerTest):
     """
     Test the read functions
     """
@@ -119,11 +119,11 @@ class OrloReadTest(OrloLiveServerTest):
         """
         Setup a complete release to test against
         """
-        self.release_id = self._create_release()
-        self.package_id = self._create_package(self.release_id)
-        self._package_start(self.release_id, self.package_id)
-        self._package_stop(self.release_id, self.package_id)
-        self._release_stop(self.release_id)
+        self.release = self._create_release()
+        self.package = self._create_package(self.release)
+        self._package_start(self.package)
+        self._package_stop(self.package)
+        self._release_stop(self.release)
 
     def test_get_releases_package_name(self):
         """

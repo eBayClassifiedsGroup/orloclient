@@ -4,6 +4,7 @@ import requests
 import uuid
 
 from .exceptions import OrloClientError, OrloServerError
+from .objects import Release, Package
 
 __author__ = 'alforbes'
 
@@ -138,20 +139,20 @@ class OrloClient(object):
         self._expect_200_response(response)
 
         release_id = response.json()['id']
-        return uuid.UUID(release_id)
+        return Release(self, release_id)
 
-    def create_package(self, release_id, name, version):
+    def create_package(self, release, name, version):
         """
         Create a package using the REST API
 
-        :param string release_id: release id to create the package for
+        :param string release: release to create the package for
         :param string name: Name of the package
         :param string version: Version of the package
         :return: package id
         """
 
         response = requests.post(
-            '{}/releases/{}/packages'.format(self.uri, release_id),
+            '{}/releases/{}/packages'.format(self.uri, release.release_id),
             headers=self.headers,
             json={
                 'name': name,
@@ -164,7 +165,8 @@ class OrloClient(object):
         self._expect_200_response(response)
 
         package_id = response.json()['id']
-        return uuid.UUID(package_id)
+        release = Release(self, release.release_id)
+        return Package(release, package_id)
 
     @staticmethod
     def release_start():
@@ -173,13 +175,14 @@ class OrloClient(object):
         """
         pass
 
-    def release_stop(self, release_id):
+    def release_stop(self, release):
         """
         Stop a release using the REST API
 
-        :param uuid.UUID release_id: Release UUID
+        :param release: Release object
         :returns boolean: Whether or not the release was successfully stopped
         """
+        release_id = release.release_id
         response = requests.post(
             '{}/releases/{}/stop'.format(self.uri, release_id),
             headers=self.headers,
@@ -189,18 +192,17 @@ class OrloClient(object):
 
         return self._expect_200_response(response, status_code=204)
 
-    def package_start(self, release_id, package_id):
+    def package_start(self, package):
         """
         Start a package using the REST API
 
-        :param uuid.UUID release_id: Release UUID
-        :param uuid.UUID package_id: Package UUID
+        :param uuid.UUID package: Package object
         :return boolean: Whether or not the package was successfully started
         """
 
         response = requests.post(
             '{}/releases/{}/packages/{}/start'.format(
-                self.uri, release_id, package_id),
+                self.uri, package.release.release_id, package.package_id),
             headers=self.headers,
             verify=self.verify_ssl,
             allow_redirects=False,
@@ -213,16 +215,16 @@ class OrloClient(object):
 
         return self._expect_200_response(response, status_code=204)
 
-    def package_stop(self, release_id, package_id,
-                     success=True):
+    def package_stop(self, package, success=True):
         """
         Start a package using the REST API
 
-        :param uuid.UUID release_id: Release UUID
-        :param uuid.UUID package_id: Package UUID
+        :param package package: Package object
         :param boolean success: Whether or not the package was successfully stopped
         :return boolean: Whether or not the package was successfully stopped
         """
+        release_id = package.release.release_id
+        package_id = package.package_id
 
         response = requests.post(
             '{}/releases/{}/packages/{}/stop'.format(

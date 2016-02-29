@@ -3,6 +3,7 @@ import httpretty
 import json
 from orloclient import OrloClientError, OrloServerError
 from tests import OrloClientTest
+import uuid
 
 __author__ = 'alforbes'
 
@@ -40,12 +41,12 @@ class TestGetReleases(OrloClientTest):
         Test getting a release by ID
         """
         httpretty.register_uri(
-                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE_ID),
+                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
                 body=self.DUMMY_JSON_S,
                 status=200,
         )
 
-        response = self.orlo.get_releases(release_id=self.RELEASE_ID)
+        response = self.orlo.get_releases(release_id=self.RELEASE.release_id)
         self.assertEqual(response['message'], self.DUMMY_JSON['message'])
 
     @httpretty.activate
@@ -54,7 +55,7 @@ class TestGetReleases(OrloClientTest):
         Test getting releases
         """
         httpretty.register_uri(
-                httpretty.GET, '{}/releases?foo=bar'.format(self.URI, self.RELEASE_ID),
+                httpretty.GET, '{}/releases?foo=bar'.format(self.URI, self.RELEASE.release_id),
                 body=self.DUMMY_JSON_S,
                 status=200,
         )
@@ -75,7 +76,7 @@ class TestGetReleases(OrloClientTest):
         Test that we pass through a filter to the request
         """
         httpretty.register_uri(
-                httpretty.GET, '{}/releases?user=foo'.format(self.URI, self.RELEASE_ID),
+                httpretty.GET, '{}/releases?user=foo'.format(self.URI, self.RELEASE.release_id),
                 body=self.DUMMY_JSON_S,
                 status=200,
         )
@@ -97,13 +98,14 @@ class CreateReleaseTest(OrloClientTest):
         httpretty.register_uri(
                 httpretty.POST, '{}/releases'.format(self.URI),
                 status=200,
-                body='{{"id": "{}"}}'.format(self.RELEASE_ID),
+                body='{{"id": "{}"}}'.format(self.RELEASE.release_id),
                 content_type='application/json',
         )
+        release = self.orlo.create_release(self.USER, self.PLATFORMS)
 
         self.assertEqual(
-                self.orlo.create_release(self.USER, self.PLATFORMS),
-                self.RELEASE_ID,
+            uuid.UUID(release.release_id),
+            self.RELEASE.release_id,
         )
 
     @httpretty.activate
@@ -114,7 +116,7 @@ class CreateReleaseTest(OrloClientTest):
         httpretty.register_uri(
                 httpretty.POST, '{}/releases'.format(self.URI),
                 status=200,
-                body='{{"id": "{}"}}'.format(self.RELEASE_ID),
+                body='{{"id": "{}"}}'.format(self.RELEASE.release_id),
                 content_type='application/json',
         )
 
@@ -131,7 +133,7 @@ class CreateReleaseTest(OrloClientTest):
         httpretty.register_uri(
                 httpretty.POST, '{}/releases'.format(self.URI),
                 status=200,
-                body='{{"id": "{}"}}'.format(self.RELEASE_ID),
+                body='{{"id": "{}"}}'.format(self.RELEASE.release_id),
                 content_type='application/json',
         )
 
@@ -148,7 +150,7 @@ class CreateReleaseTest(OrloClientTest):
         httpretty.register_uri(
                 httpretty.POST, '{}/releases'.format(self.URI),
                 status=200,
-                body='{{"id": "{}"}}'.format(self.RELEASE_ID),
+                body='{{"id": "{}"}}'.format(self.RELEASE.release_id),
                 content_type='application/json',
         )
 
@@ -169,12 +171,12 @@ class ReleaseStopTest(OrloClientTest):
         Test release_stop
         """
         httpretty.register_uri(
-                httpretty.POST, '{}/releases/{}/stop'.format(self.URI, self.RELEASE_ID),
+                httpretty.POST, '{}/releases/{}/stop'.format(self.URI, self.RELEASE.release_id),
                 status=204,
                 content_type='application/json',
         )
 
-        self.assertEqual(self.orlo.release_stop(self.RELEASE_ID), True)
+        self.assertEqual(self.orlo.release_stop(self.RELEASE), True)
 
 
 class WorkflowTest(OrloClientTest):
@@ -189,13 +191,13 @@ class WorkflowTest(OrloClientTest):
         """
         httpretty.register_uri(
                 httpretty.POST, '{}/releases/{}/packages/{}/start'.format(
-                        self.URI, self.RELEASE_ID, self.PACKAGE_ID),
+                        self.URI, self.RELEASE.release_id, self.PACKAGE.package_id),
                 status=204,
                 content_type='application/json',
         )
 
         self.assertEqual(
-                self.orlo.package_start(self.RELEASE_ID, self.PACKAGE_ID),
+                self.orlo.package_start(self.PACKAGE),
                 True)
 
     @httpretty.activate
@@ -205,13 +207,13 @@ class WorkflowTest(OrloClientTest):
         """
         httpretty.register_uri(
                 httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
-                        self.URI, self.RELEASE_ID, self.PACKAGE_ID),
+                        self.URI, self.RELEASE.release_id, self.PACKAGE.package_id),
                 status=204,
                 content_type='application/json',
         )
 
         self.assertEqual(
-                self.orlo.package_stop(self.RELEASE_ID, self.PACKAGE_ID),
+                self.orlo.package_stop(self.PACKAGE),
                 True)
 
     @httpretty.activate
@@ -221,12 +223,12 @@ class WorkflowTest(OrloClientTest):
         """
         httpretty.register_uri(
                 httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
-                        self.URI, self.RELEASE_ID, self.PACKAGE_ID),
+                        self.URI, self.RELEASE.release_id, self.PACKAGE.package_id),
                 status=204,
                 content_type='application/json',
         )
 
-        self.orlo.package_stop(self.RELEASE_ID, self.PACKAGE_ID, success=True)
+        self.orlo.package_stop(self.PACKAGE, success=True)
 
         body = json.loads(httpretty.last_request().body)
         self.assertEqual(True, body['success'])
@@ -238,12 +240,12 @@ class WorkflowTest(OrloClientTest):
         """
         httpretty.register_uri(
                 httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
-                        self.URI, self.RELEASE_ID, self.PACKAGE_ID),
+                        self.URI, self.RELEASE.release_id, self.PACKAGE.package_id),
                 status=204,
                 content_type='application/json',
         )
 
-        self.orlo.package_stop(self.RELEASE_ID, self.PACKAGE_ID, success=False)
+        self.orlo.package_stop(self.PACKAGE, success=False)
 
         body = json.loads(httpretty.last_request().body)
         self.assertEqual(False, body['success'])
@@ -261,11 +263,11 @@ class ErrorTest(OrloClientTest):
         """
 
         httpretty.register_uri(
-                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE_ID),
+                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
                 status=404,
                 content_type='application/json',
         )
-        self.assertRaises(OrloClientError, self.orlo.get_releases, self.RELEASE_ID)
+        self.assertRaises(OrloClientError, self.orlo.get_releases, self.RELEASE.release_id)
 
     @httpretty.activate
     def test_error_invalid_json(self):
@@ -274,11 +276,11 @@ class ErrorTest(OrloClientTest):
         """
 
         httpretty.register_uri(
-                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE_ID),
+                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
                 status=200,
                 body='{"foo": "bar"} this is not valid json',
         )
-        self.assertRaises(OrloClientError, self.orlo.get_releases, self.RELEASE_ID)
+        self.assertRaises(OrloClientError, self.orlo.get_releases, self.RELEASE.release_id)
 
 
 class InfoTest(OrloClientTest):

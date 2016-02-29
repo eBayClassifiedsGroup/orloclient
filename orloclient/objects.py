@@ -94,9 +94,8 @@ class Package(object):
         :param UUID package_id:
         :return:
         """
-        # Don't use these
-        self._release = release
-        self._package_id = package_id
+        self.package_id = package_id
+        self.release = release
         self._data = None
 
     def __getattr__(self, item):
@@ -108,8 +107,8 @@ class Package(object):
         :return:
         """
         if not self._data:
-            release = object.__getattribute__(self, '_release')
-            self._data = [p for p in release.packages if p['id'] == self._package_id]
+            release = object.__getattribute__(self, 'release')
+            self._data = [p for p in release.packages if p['id'] == self.package_id]
 
         try:
             return cast_type(item, self._data[0][item])
