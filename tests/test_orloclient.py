@@ -46,7 +46,7 @@ class TestGetReleases(OrloClientTest):
                 status=200,
         )
 
-        response = self.orlo.get_releases(release_id=self.RELEASE.release_id)
+        response = self.orlo.get_release(self.RELEASE.release_id)
         self.assertEqual(response['message'], self.DUMMY_JSON['message'])
 
     @httpretty.activate
@@ -267,7 +267,7 @@ class ErrorTest(OrloClientTest):
                 status=404,
                 content_type='application/json',
         )
-        self.assertRaises(OrloClientError, self.orlo.get_releases, self.RELEASE.release_id)
+        self.assertRaises(OrloClientError, self.orlo.get_release, self.RELEASE.release_id)
 
     @httpretty.activate
     def test_error_invalid_json(self):
@@ -280,7 +280,7 @@ class ErrorTest(OrloClientTest):
                 status=200,
                 body='{"foo": "bar"} this is not valid json',
         )
-        self.assertRaises(OrloClientError, self.orlo.get_releases, self.RELEASE.release_id)
+        self.assertRaises(OrloClientError, self.orlo.get_release, self.RELEASE.release_id)
 
 
 class InfoTest(OrloClientTest):

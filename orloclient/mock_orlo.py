@@ -1,5 +1,5 @@
 from __future__ import print_function
-from orloclient import OrloClient
+from orloclient import OrloClient, Release, Package
 import json
 import uuid
 
@@ -16,7 +16,7 @@ class MockOrloClient(object):
 
     Will return values from the example objects below.
     """
-    example_package = {
+    example_package_dict = {
         "status": "SUCCESSFUL",
         "name": "testName",
         "version": "1.2.3",
@@ -27,7 +27,7 @@ class MockOrloClient(object):
         "id": str(uuid.uuid4())
     }
 
-    example_release = {
+    example_release_dict = {
         "platforms": [
             "testplatform"
         ],
@@ -36,13 +36,13 @@ class MockOrloClient(object):
         "team": None,
         "duration": 0,
         "references": [],
-        "packages": [example_package],
+        "packages": [example_package_dict],
         "id": str(uuid.uuid4()),
         "user": "testuser",
         "metadata": {"env": "test", "pool": "web"}
     }
 
-    example_stats = {
+    example_stats_dict = {
         "global": {
             "releases": {
                 "normal": {
@@ -65,26 +65,37 @@ class MockOrloClient(object):
         self.uri = uri
         self.verify_ssl = verify_ssl
 
+        self.example_release = Release(
+            self, self.example_release_dict['id']
+        )
+
+        self.example_package = Package(
+            self.example_release, self.example_package_dict['id']
+        )
+
     def ping(self):
         return True
 
+    def get_release(self, release_id):
+        return Release
+
     def get_releases(self, *args, **kwargs):
         response = {
-            'releases': [self.example_release]
+            'releases': [self.example_release_dict]
         }
         return json.dumps(response)
 
     def create_release(self, *args, **kwargs):
-        return uuid.UUID(self.example_release['id'])
+        return self.example_release
 
     def create_package(self, *args, **kwargs):
-        return uuid.UUID(self.example_package['id'])
+        return self.example_package
 
     def get_info(self, field, name=None, platform=None):
         return {'foo': {'bar': 1}}
 
     def get_stats(self, field=None, name=None, platform=None, stime=None, ftime=None):
-        return json.dumps(self.example_stats)
+        return json.dumps(self.example_stats_dict)
 
     def release_stop(self, release_id):
         return True

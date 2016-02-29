@@ -66,24 +66,32 @@ class OrloClient(object):
         else:
             return False
 
-    def get_releases(self, release_id=False, **kwargs):
+    def get_release(self, release_id):
         """
-        Fetch releases from the orlo API, optionally filtering
+        Fetch a single Release
+
+        :param release_id:
+        :return:
+        """
+        url = "{url}/releases/{id}".format(url=self.uri, id=release_id)
+        response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
+        self.logger.debug(response)
+        return self._expect_200_response(response)
+
+    def get_releases(self, **kwargs):
+        """
+        Fetch releases from the orlo API with filters
 
         http://orlo.readthedocs.org/en/latest/rest.html#get--releases
-        :param release_id:
         :param kwargs: Filters to apply
         """
         self.logger.debug("Entering get_releases")
 
-        if not release_id and len(kwargs) is 0:
+        if len(kwargs) is 0:
             msg = "Must specify at least one filter for releases"
             raise OrloClientError(msg)
 
-        if release_id:
-            url = "{url}/releases/{id}".format(url=self.uri, id=release_id)
-        else:
-            url = "{url}/releases".format(url=self.uri)
+        url = "{url}/releases".format(url=self.uri)
 
         filters = []
 
@@ -100,10 +108,7 @@ class OrloClient(object):
         return self._expect_200_response(response)
 
     def create_release(self, user, platforms,
-                       team=None,
-                       references=None,
-                       note=None,
-                       ):
+                       team=None, references=None, note=None):
         """
         Create a release using the REST API
         :param string user: User performing the release

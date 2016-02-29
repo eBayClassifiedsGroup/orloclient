@@ -13,8 +13,8 @@ client = MockOrloClient('http://dummy.example.com')
 
 class TestPackage(OrloClientTest):
     def setUp(self):
-        self.rid = client.example_release['id']
-        self.pid = client.example_package['id']
+        self.rid = client.example_release_dict['id']
+        self.pid = client.example_package_dict['id']
         self.release = Release(client, self.rid)
         self.package = Package(self.release, self.pid)
 
@@ -39,22 +39,22 @@ class TestPackage(OrloClientTest):
         self.assertIsInstance(self.package.stime,
                               arrow.arrow.Arrow)
         self.assertEqual(self.package.stime,
-                         arrow.get(client.example_package['stime']))
+                         arrow.get(client.example_package_dict['stime']))
 
     def test_package_ftime(self):
         self.assertIsInstance(self.package.ftime,
                               arrow.arrow.Arrow)
         self.assertEqual(self.package.ftime,
-                         arrow.get(client.example_package['ftime']))
+                         arrow.get(client.example_package_dict['ftime']))
 
     def test_package_duration_int(self):
         self.assertIsInstance(self.package.duration, int)
         self.assertEqual(self.package.duration,
-                         client.example_package['duration'])
+                         client.example_package_dict['duration'])
 
     def test_package_when_value_none(self):
         """
         Test that we get NoneType when a value is None
         """
-        client.example_package['none_attribute'] = None
+        client.example_package_dict['none_attribute'] = None
         self.assertIs(self.package.none_attribute, None)

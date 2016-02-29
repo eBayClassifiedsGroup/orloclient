@@ -1,6 +1,6 @@
 from __future__ import print_function
 from orloclient.mock_orlo import MockOrloClient
-from orloclient import OrloClient
+from orloclient import OrloClient, Release, Package
 from unittest import TestCase
 import uuid
 import json
@@ -47,11 +47,11 @@ class TestMockOrlo(TestCase):
 
     def test_create_package(self):
         result = self.mock_client.create_package()
-        self.assertIsInstance(result, uuid.UUID)
+        self.assertIsInstance(result, Package)
 
     def test_create_release(self):
         result = self.mock_client.create_release()
-        self.assertIsInstance(result, uuid.UUID)
+        self.assertIsInstance(result, Release)
 
     def test_get_info(self):
         result = self.mock_client.get_info('foo')

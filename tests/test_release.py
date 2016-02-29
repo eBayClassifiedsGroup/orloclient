@@ -17,7 +17,7 @@ Tests of the Release class use the mock client
 
 class TestRelease(OrloClientTest):
     def setUp(self):
-        self.release_id = client.example_release['id']
+        self.release_id = client.example_release_dict['id']
         self.release = Release(client, self.release_id)
 
     def test_release_id(self):
@@ -41,32 +41,32 @@ class TestRelease(OrloClientTest):
         self.assertIsInstance(self.release.stime,
                               arrow.arrow.Arrow)
         self.assertEqual(self.release.stime,
-                         arrow.get(client.example_release['stime']))
+                         arrow.get(client.example_release_dict['stime']))
 
     def test_release_ftime(self):
         self.assertIsInstance(self.release.ftime,
                               arrow.arrow.Arrow)
         self.assertEqual(self.release.ftime,
-                         arrow.get(client.example_release['ftime']))
+                         arrow.get(client.example_release_dict['ftime']))
 
     def test_release_meta(self):
         self.assertIsInstance(self.release.metadata, dict)
         self.assertEqual(self.release.metadata,
-                         client.example_release['metadata'])
+                         client.example_release_dict['metadata'])
 
     def test_release_platforms(self):
         self.assertIsInstance(self.release.platforms, list)
         self.assertEqual(self.release.platforms,
-                         client.example_release['platforms'])
+                         client.example_release_dict['platforms'])
 
     def test_release_duration_int(self):
         self.assertIsInstance(self.release.duration, int)
         self.assertEqual(self.release.duration,
-                         client.example_release['duration'])
+                         client.example_release_dict['duration'])
 
     def test_release_when_value_none(self):
         """
         Test that we get NoneType when a value is None
         """
-        client.example_release['none_attribute'] = None
+        client.example_release_dict['none_attribute'] = None
         self.assertIs(self.release.none_attribute, None)
