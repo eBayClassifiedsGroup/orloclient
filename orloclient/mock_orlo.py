@@ -70,7 +70,10 @@ class MockOrloClient(object):
         )
 
         self.example_package = Package(
-            self.example_release, self.example_package_dict['id']
+            self.example_release_dict['id'],
+            self.example_package_dict['id'],
+            self.example_package_dict['name'],
+            self.example_package_dict['version'],
         )
 
     def ping(self):
@@ -78,6 +81,11 @@ class MockOrloClient(object):
 
     def get_release(self, release_id):
         return Release
+
+    def get_release_json(self, release_id):
+        return {
+            'releases': [self.example_release_dict]
+        }
 
     def get_releases(self, *args, **kwargs):
         response = {

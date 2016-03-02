@@ -24,6 +24,7 @@ class TestRelease(OrloClientTest):
         """
         Test that the release id returned matches the one from the mock and is a UUID
         """
+        print(self.release.id)
         self.assertIsInstance(self.release.id, uuid.UUID)
         self.assertEqual(self.release.id, uuid.UUID(self.release_id))
 
@@ -70,3 +71,9 @@ class TestRelease(OrloClientTest):
         """
         client.example_release_dict['none_attribute'] = None
         self.assertIs(self.release.none_attribute, None)
+
+    def test_release_packages_list(self):
+        """
+        Test we get a list when calling the packages attribute
+        """
+        self.assertIsInstance(self.release.packages, list)

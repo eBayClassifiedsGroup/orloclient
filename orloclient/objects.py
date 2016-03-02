@@ -38,7 +38,7 @@ class Release(object):
         # Recommend not using it at all, use "data" instead
         self._data = None
 
-        self.release_id = release_id
+        self.id = self.release_id = release_id
 
     def __getattr__(self, item):
         """
@@ -58,6 +58,9 @@ class Release(object):
         if item == 'data':
             return self._data
 
+        if item == 'packages':
+            return self.list_packages()
+
         try:
             # The data returned by Orlo is a JSON structure, containing a list
             # of releases, even though there can only be one
@@ -71,49 +74,44 @@ class Release(object):
 
         return cast_type(item, value)
 
+    def list_packages(self):
+        """
+        Return a list of Package objects
+
+        :return list:
+        """
+        l = []
+        data = self.data
+        for p in self.data['releases'][0]['packages']:
+            # Create Package
+            pkg = Package(self.id, p['id'], p['name'], p['version'])
+
+            # Set all attributes from the data
+            for item, value in p.items():
+                setattr(pkg, item, cast_type(item, value))
+            l.append(pkg)
+        return l
+
     def fetch(self):
         """
         Fetch the data for a release
         """
-        release = self.client.get_releases(release_id=self.release_id)
-        self._data = json.loads(release)
+        self._data = self.client.get_release_json(self.release_id)
 
     def deploy(self):
         raise NotImplementedError("Coming soon")
 
 
 class Package(object):
-    def __init__(self, release, package_id):
+    def __init__(self, release_id, package_id, package_name, version):
         """
         An Orlo Package
 
-        At the moment, Packages are dependant on release, as there is no /packages endpoint
-
-        Thus, this just fetches the values from its parent release
-        :param Release release:
-        :param UUID package_id:
-        :return:
+        Only these attributes are required, the rest may or may not be set.
         """
-        self.package_id = package_id
-        self.release = release
-        self._data = None
+        self.id = package_id
+        self.name = package_name
+        self.release_id = release_id
+        self.version = version
 
-    def __getattr__(self, item):
-        """
-        The release holds all the information about the packages,
-        so fetch attributes from parent
-
-        :param item:
-        :return:
-        """
-        if not self._data:
-            release = object.__getattribute__(self, 'release')
-            self._data = [p for p in release.packages if p['id'] == self.package_id]
-
-        try:
-            return cast_type(item, self._data[0][item])
-        except KeyError:
-            raise OrloClientError("This object does not have attribute '{}'\n{}".format(
-                item, json.dumps(self._data, indent=2)
-            ))
 

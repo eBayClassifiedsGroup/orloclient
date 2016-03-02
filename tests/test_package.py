@@ -16,7 +16,7 @@ class TestPackage(OrloClientTest):
         self.rid = client.example_release_dict['id']
         self.pid = client.example_package_dict['id']
         self.release = Release(client, self.rid)
-        self.package = Package(self.release, self.pid)
+        self.package = self.release.packages[0]
 
     def test_package_id(self):
         """
@@ -24,13 +24,6 @@ class TestPackage(OrloClientTest):
         """
         self.assertIsInstance(self.package.id, uuid.UUID)
         self.assertEqual(self.package.id, uuid.UUID(self.pid))
-
-    def test_package_bad_attribute(self):
-        """
-        Test that we get KeyError when a bad attribute is requested
-        """
-        with self.assertRaises(OrloClientError):
-            return self.package.bad_attribute_19846
 
     def test_package_stime(self):
         """
@@ -51,10 +44,3 @@ class TestPackage(OrloClientTest):
         self.assertIsInstance(self.package.duration, int)
         self.assertEqual(self.package.duration,
                          client.example_package_dict['duration'])
-
-    def test_package_when_value_none(self):
-        """
-        Test that we get NoneType when a value is None
-        """
-        client.example_package_dict['none_attribute'] = None
-        self.assertIs(self.package.none_attribute, None)

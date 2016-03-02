@@ -18,13 +18,10 @@ class OrloClientTest(TestCase):
     URI = 'http://localhost:1337'
     USER = 'test_user'
 
-    RELEASE = Release(
-        MockOrloClient('http://dummy.example.com'), uuid.uuid4(),
-    )
+    CLIENT = MockOrloClient('http://dummy.example.com')
+    RELEASE = Release(CLIENT, uuid.uuid4())
 
-    PACKAGE = Package(
-        RELEASE, uuid.uuid4()
-    )
+    PACKAGE = RELEASE.packages[0]
 
     def setUp(self):
         self.orlo = OrloClient(self.URI)

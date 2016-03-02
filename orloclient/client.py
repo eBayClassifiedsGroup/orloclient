@@ -24,13 +24,13 @@ class OrloClient(object):
         self.uri = uri
         self.verify_ssl = verify_ssl
 
-    def _expect_200_response(self, response, status_code=200):
+    def _expect_200_json_response(self, response, status_code=200):
         """
         Check for an appropriate status code
 
         :param response response: Requests library response object
         :param int status_code: The expected status_code
-        :return:
+        :return dict:
         """
         self.logger.debug("Response {}:\n{}".format(response.status_code, response.text))
 
@@ -73,10 +73,13 @@ class OrloClient(object):
         :param release_id:
         :return:
         """
-        url = "{url}/releases/{id}".format(url=self.uri, id=release_id)
-        response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
-        self.logger.debug(response)
-        return self._expect_200_response(response)
+        
+        response_dict = self.get_release_json(release_id)
+        self.logger.debug(response_dict)
+
+        releases_list = [Release(self, r['id']) for r in response_dict['releases']]
+
+        return releases_list
 
     def get_releases(self, **kwargs):
         """
@@ -105,7 +108,28 @@ class OrloClient(object):
 
         response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
         self.logger.debug(response)
-        return self._expect_200_response(response)
+
+        response_dict = self._expect_200_json_response(response)
+        releases_list = [Release(self, r['id']) for r in response_dict['releases']]
+
+        return releases_list
+
+    def get_release_json(self, release_id):
+        """
+        Fetch a releases from the orlo API
+
+        :param release_id:
+        :returns dict:
+        """
+        self.logger.debug("Entering get_releases")
+        url = "{url}/releases/{rid}".format(url=self.uri, rid=release_id)
+
+        filters = []
+
+        response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
+        self.logger.debug(response)
+        r = self._expect_200_json_response(response)
+        return r
 
     def create_release(self, user, platforms,
                        team=None, references=None, note=None):
@@ -140,7 +164,7 @@ class OrloClient(object):
             allow_redirects=False,
         )
 
-        self._expect_200_response(response)
+        self._expect_200_json_response(response)
 
         release_id = response.json()['id']
         return Release(self, release_id)
@@ -166,11 +190,10 @@ class OrloClient(object):
             allow_redirects=False,
         )
 
-        self._expect_200_response(response)
+        self._expect_200_json_response(response)
 
-        package_id = response.json()['id']
-        release = Release(self, release.release_id)
-        return Package(release, package_id)
+        pkg = response.json()
+        return Package(release.id, pkg['id'], name, version)
 
     @staticmethod
     def release_start():
@@ -194,19 +217,20 @@ class OrloClient(object):
             allow_redirects=False,
         )
 
-        return self._expect_200_response(response, status_code=204)
+        return self._expect_200_json_response(response, status_code=204)
 
-    def package_start(self, package):
+    def package_start(self, release, package):
         """
         Start a package using the REST API
 
+        :param Release release: Release object
         :param Package package: Package object
         :return boolean: Whether or not the package was successfully started
         """
 
         response = requests.post(
             '{}/releases/{}/packages/{}/start'.format(
-                self.uri, package.release.release_id, package.package_id),
+                self.uri, release.release_id, package.id),
             headers=self.headers,
             verify=self.verify_ssl,
             allow_redirects=False,
@@ -217,18 +241,19 @@ class OrloClient(object):
             raise OrloServerError(
                 "Orlo server returned non-204 status code: {}".format(response.json()))
 
-        return self._expect_200_response(response, status_code=204)
+        return self._expect_200_json_response(response, status_code=204)
 
-    def package_stop(self, package, success=True):
+    def package_stop(self, release, package, success=True):
         """
         Start a package using the REST API
 
+        :param Release release: Release object
         :param package package: Package object
         :param boolean success: Whether or not the package was successfully stopped
         :return boolean: Whether or not the package was successfully stopped
         """
-        release_id = package.release.release_id
-        package_id = package.package_id
+        release_id = package.release_id
+        package_id = package.id
 
         response = requests.post(
             '{}/releases/{}/packages/{}/stop'.format(
@@ -241,7 +266,7 @@ class OrloClient(object):
             allow_redirects=False,
         )
 
-        return self._expect_200_response(response, status_code=204)
+        return self._expect_200_json_response(response, status_code=204)
 
     def get_info(self, field, name=None, platform=None):
         """

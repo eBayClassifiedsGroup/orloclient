@@ -38,16 +38,16 @@ class OrloLiveServerTest(LiveServerTestCase):
         orlo.orm.db.drop_all()
 
     def _create_release(self):
-        return self.orlo_client.create_release('testuser', 'testplatform')
+        return self.orlo_client.create_release('testuser', ['testplatform'])
 
     def _create_package(self, release):
         return self.orlo_client.create_package(release, 'testName', '1.2.3')
 
-    def _package_start(self, package):
-        return self.orlo_client.package_start(package)
+    def _package_start(self, release, package):
+        return self.orlo_client.package_start(release, package)
 
-    def _package_stop(self, package, success=True):
-        return self.orlo_client.package_stop(package, success)
+    def _package_stop(self, release, package, success=True):
+        return self.orlo_client.package_stop(release, package, success)
 
     def _release_stop(self, release):
         return self.orlo_client.release_stop(release)
@@ -86,7 +86,7 @@ class TestOrloWrite(OrloLiveServerTest):
         """
         release = self._create_release()
         package = self._create_package(release)
-        result = self._package_start(package)
+        result = self._package_start(release, package)
 
         self.assertTrue(result)
 
@@ -96,8 +96,8 @@ class TestOrloWrite(OrloLiveServerTest):
         """
         release = self._create_release()
         package = self._create_package(release)
-        self._package_start(package)
-        result = self._package_stop(package)
+        self._package_start(release, package)
+        result = self._package_stop(release, package)
 
         self.assertTrue(result)
 
@@ -120,9 +120,10 @@ class TestOrloRead(OrloLiveServerTest):
         Setup a complete release to test against
         """
         self.release = self._create_release()
+        print(self.release)
         self.package = self._create_package(self.release)
-        self._package_start(self.package)
-        self._package_stop(self.package)
+        self._package_start(self.release, self.package)
+        self._package_stop(self.release, self.package)
         self._release_stop(self.release)
 
     def test_get_releases_package_name(self):
@@ -130,30 +131,31 @@ class TestOrloRead(OrloLiveServerTest):
         Test get_releases with a filter on package_name
         """
         self._setup_release()
-        result = self.orlo_client.get_releases(package_name='testName')
-        self.assertIsInstance(result, dict)
+        releases = self.orlo_client.get_releases(package_name='testName')
+        self.assertIsInstance(releases[0], Release)
 
     def test_get_releases_user(self):
         """
         Test get_releases with a filter on user
         """
         self._setup_release()
-        result = self.orlo_client.get_releases(user='testuser')
-        self.assertIsInstance(result, dict)
+        releases = self.orlo_client.get_releases(user='testuser')
+        self.assertIsInstance(releases[0], Release)
 
     def test_get_releases_empty(self):
         """
         Test it doesn't blow up when there are no releases
         """
-        result = self.orlo_client.get_releases(platform='test_platform')
-        self.assertIsInstance(result, dict)
-        self.assertEqual(0, len(result['releases']))
+        releases = self.orlo_client.get_releases(user='blah_blah')
+        self.assertIsInstance(releases, list)
+        self.assertEqual(0, len(releases))
 
     def test_get_releases_empty_filter(self):
         """
         Test it doesn't blow up when filters don't match
         """
-        result = self.orlo_client.get_releases(user='doesNotExist')
-        self.assertIsInstance(result, dict)
-        self.assertEqual(0, len(result['releases']))
+        self._create_release()
+        releases = self.orlo_client.get_releases(user='doesNotExist')
+        self.assertIsInstance(releases, list)
+        self.assertEqual(0, len(releases))
 
