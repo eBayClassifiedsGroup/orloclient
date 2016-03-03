@@ -82,8 +82,7 @@ class TestGetReleases(OrloClientTest):
         )
 
         release_list = self.orlo.get_releases(foo='bar')
-        print(release_list[0].id)
-        self.assertEqual(release_list[0].id, self.RELEASE.id)
+        self.assertEqual(release_list[0].id, self.RELEASE_JSON['releases'][0]['id'])
 
     def test_get_releases_unfiltered_raises(self):
         """
@@ -132,7 +131,7 @@ class CreateReleaseTest(OrloClientTest):
 
         self.assertEqual(
             uuid.UUID(release.release_id),
-            self.RELEASE.release_id,
+            self.RELEASE.uuid,
         )
 
     @httpretty.activate
@@ -224,7 +223,7 @@ class WorkflowTest(OrloClientTest):
         )
 
         self.assertEqual(
-                self.orlo.package_start(self.RELEASE, self.PACKAGE),
+                self.orlo.package_start(self.PACKAGE),
                 True)
 
     @httpretty.activate
@@ -240,8 +239,7 @@ class WorkflowTest(OrloClientTest):
         )
 
         self.assertEqual(
-                self.orlo.package_stop(self.RELEASE, self.PACKAGE),
-                True)
+                self.orlo.package_stop(self.PACKAGE), True)
 
     @httpretty.activate
     def test_package_stop_with_success_true(self):
@@ -255,7 +253,7 @@ class WorkflowTest(OrloClientTest):
                 content_type='application/json',
         )
 
-        self.orlo.package_stop(self.RELEASE, self.PACKAGE, success=True)
+        self.orlo.package_stop(self.PACKAGE, success=True)
 
         body = json.loads(httpretty.last_request().body)
         self.assertEqual(True, body['success'])
@@ -272,7 +270,7 @@ class WorkflowTest(OrloClientTest):
                 content_type='application/json',
         )
 
-        self.orlo.package_stop(self.RELEASE, self.PACKAGE, success=False)
+        self.orlo.package_stop(self.PACKAGE, success=False)
 
         body = json.loads(httpretty.last_request().body)
         self.assertEqual(False, body['success'])

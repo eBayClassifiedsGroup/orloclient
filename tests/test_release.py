@@ -24,9 +24,8 @@ class TestRelease(OrloClientTest):
         """
         Test that the release id returned matches the one from the mock and is a UUID
         """
-        print(self.release.id)
-        self.assertIsInstance(self.release.id, uuid.UUID)
-        self.assertEqual(self.release.id, uuid.UUID(self.release_id))
+        self.assertIsInstance(self.release.uuid, uuid.UUID)
+        self.assertEqual(self.release.uuid, uuid.UUID(self.release_id))
 
     def test_release_bad_attribute(self):
         """

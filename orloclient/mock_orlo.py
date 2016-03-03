@@ -79,7 +79,8 @@ class MockOrloClient(object):
     def ping(self):
         return True
 
-    def get_release(self, release_id):
+    @staticmethod
+    def get_release(release_id):
         return Release
 
     def get_release_json(self, release_id):
@@ -99,13 +100,15 @@ class MockOrloClient(object):
     def create_package(self, *args, **kwargs):
         return self.example_package
 
-    def get_info(self, field, name=None, platform=None):
+    @staticmethod
+    def get_info(field, name=None, platform=None):
         return {'foo': {'bar': 1}}
 
     def get_stats(self, field=None, name=None, platform=None, stime=None, ftime=None):
         return json.dumps(self.example_stats_dict)
 
-    def release_stop(self, release_id):
+    @staticmethod
+    def release_stop(release_id):
         return True
 
     @staticmethod

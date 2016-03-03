@@ -78,8 +78,10 @@ class OrloClient(object):
         self.logger.debug(response_dict)
 
         releases_list = [Release(self, r['id']) for r in response_dict['releases']]
+        if len(releases_list) > 1:
+            raise OrloServerError("Got list of length > 1")
 
-        return releases_list
+        return releases_list[0]
 
     def get_releases(self, **kwargs):
         """
@@ -123,8 +125,6 @@ class OrloClient(object):
         """
         self.logger.debug("Entering get_releases")
         url = "{url}/releases/{rid}".format(url=self.uri, rid=release_id)
-
-        filters = []
 
         response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
         self.logger.debug(response)
@@ -219,18 +219,17 @@ class OrloClient(object):
 
         return self._expect_200_json_response(response, status_code=204)
 
-    def package_start(self, release, package):
+    def package_start(self, package):
         """
         Start a package using the REST API
 
-        :param Release release: Release object
         :param Package package: Package object
         :return boolean: Whether or not the package was successfully started
         """
 
         response = requests.post(
             '{}/releases/{}/packages/{}/start'.format(
-                self.uri, release.release_id, package.id),
+                self.uri, package.release_id, package.id),
             headers=self.headers,
             verify=self.verify_ssl,
             allow_redirects=False,
@@ -243,12 +242,11 @@ class OrloClient(object):
 
         return self._expect_200_json_response(response, status_code=204)
 
-    def package_stop(self, release, package, success=True):
+    def package_stop(self, package, success=True):
         """
         Start a package using the REST API
 
-        :param Release release: Release object
-        :param package package: Package object
+        :param Package package: Package object
         :param boolean success: Whether or not the package was successfully stopped
         :return boolean: Whether or not the package was successfully stopped
         """

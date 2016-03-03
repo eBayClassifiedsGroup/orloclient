@@ -43,11 +43,11 @@ class OrloLiveServerTest(LiveServerTestCase):
     def _create_package(self, release):
         return self.orlo_client.create_package(release, 'testName', '1.2.3')
 
-    def _package_start(self, release, package):
-        return self.orlo_client.package_start(release, package)
+    def _package_start(self, package):
+        return self.orlo_client.package_start(package)
 
-    def _package_stop(self, release, package, success=True):
-        return self.orlo_client.package_stop(release, package, success)
+    def _package_stop(self, package, success=True):
+        return self.orlo_client.package_stop(package, success)
 
     def _release_stop(self, release):
         return self.orlo_client.release_stop(release)
@@ -76,8 +76,8 @@ class TestOrloWrite(OrloLiveServerTest):
         """
         Create package
         """
-        release_id = self._create_release()
-        result = self._create_package(release_id)
+        release = self._create_release()
+        result = self._create_package(release)
         self.assertIsInstance(result, Package)
 
     def test_package_start(self):
@@ -86,7 +86,7 @@ class TestOrloWrite(OrloLiveServerTest):
         """
         release = self._create_release()
         package = self._create_package(release)
-        result = self._package_start(release, package)
+        result = self._package_start(package)
 
         self.assertTrue(result)
 
@@ -96,8 +96,8 @@ class TestOrloWrite(OrloLiveServerTest):
         """
         release = self._create_release()
         package = self._create_package(release)
-        self._package_start(release, package)
-        result = self._package_stop(release, package)
+        self._package_start(package)
+        result = self._package_stop(package)
 
         self.assertTrue(result)
 
@@ -105,8 +105,8 @@ class TestOrloWrite(OrloLiveServerTest):
         """
         Stop a release
         """
-        release_id = self._create_release()
-        result = self._release_stop(release_id)
+        release = self._create_release()
+        result = self._release_stop(release)
         self.assertTrue(result)
 
 
@@ -120,10 +120,9 @@ class TestOrloRead(OrloLiveServerTest):
         Setup a complete release to test against
         """
         self.release = self._create_release()
-        print(self.release)
         self.package = self._create_package(self.release)
-        self._package_start(self.release, self.package)
-        self._package_stop(self.release, self.package)
+        self._package_start(self.package)
+        self._package_stop(self.package)
         self._release_stop(self.release)
 
     def test_get_releases_package_name(self):

@@ -31,7 +31,8 @@ class Release(object):
         """
         A base class to handle fetching attributes from the Orlo server
 
-        :param client: OrloClient instance pointing to the server
+        :param string release_id: Release ID
+        :param OrloClient() client: OrloClient instance pointing to the server
         """
         self.client = client
         # Don't access this directly before calling fetch(), or you get None
@@ -39,6 +40,7 @@ class Release(object):
         self._data = None
 
         self.id = self.release_id = release_id
+        self.uuid = uuid.UUID(release_id)
 
     def __getattr__(self, item):
         """

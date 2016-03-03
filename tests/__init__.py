@@ -19,7 +19,7 @@ class OrloClientTest(TestCase):
     USER = 'test_user'
 
     CLIENT = MockOrloClient('http://dummy.example.com')
-    RELEASE = Release(CLIENT, uuid.uuid4())
+    RELEASE = Release(CLIENT, str(uuid.uuid4()))
 
     PACKAGE = RELEASE.packages[0]
 
