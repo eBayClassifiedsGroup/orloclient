@@ -68,7 +68,7 @@ class TestGetReleases(OrloClientTest):
         )
 
         result = self.orlo.get_release(rid)
-        self.assertEqual(result[0].id, str(rid))
+        self.assertEqual(result.id, str(rid))
 
     @httpretty.activate
     def test_get_releases(self):

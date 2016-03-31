@@ -78,3 +78,7 @@ class TestMockOrlo(TestCase):
 
     def test_release_stop(self):
         self.assertEqual(self.mock_client.release_stop('foo'), True)
+
+    def test_get_release(self):
+        result = self.mock_client.get_release(str(uuid.uuid4()))
+        self.assertIsInstance(result, Release)

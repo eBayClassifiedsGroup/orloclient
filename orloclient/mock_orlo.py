@@ -79,9 +79,8 @@ class MockOrloClient(object):
     def ping(self):
         return True
 
-    @staticmethod
-    def get_release(release_id):
-        return Release
+    def get_release(self, release_id):
+        return Release(self, release_id)
 
     def get_release_json(self, release_id):
         return {
