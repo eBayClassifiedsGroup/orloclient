@@ -12,9 +12,12 @@ class OrloClient(object):
     """
     Reference object to our Orlo server
 
-    This object is intended to be a very thin layer to the actual http
-    calls, there is very little abstraction. See OrloRelease and OrloPackage
-    if you want more OO-like objects.
+    This object is intended to be a very thin layer to the actual http calls,
+    there is very little abstraction. See Release and Package if you want
+    more OO-like objects.
+
+    See mock_orlo for a mock-up of this class. Tests other than test_orloclient
+    use the mock.
     """
 
     headers = {'Content-Type': 'application/json'}

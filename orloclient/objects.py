@@ -14,8 +14,8 @@ def cast_type(item, value):
     Some non-base objects (times and uuids) need to be cast manually.
     Rest are already the correct type courtesy of being imported with json.loads.
 
-    :param item:
-    :param value:
+    :param item: The parameter/variable name
+    :param value: The value to cast
     """
     if item.endswith('_id') or item == 'id':
         return uuid.UUID(value)

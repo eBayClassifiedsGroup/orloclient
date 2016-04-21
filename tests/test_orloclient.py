@@ -10,8 +10,8 @@ __author__ = 'alforbes'
 '''
 test_orloclient.py
 
-This file mocks the request library, hence it is a test of the client only, and not its
-integration with the orlo server
+This file mocks the request library, hence it is a test of the client only, and
+not its integration with the orlo server
 '''
 
 
@@ -33,13 +33,15 @@ class TestOrloBase(OrloClientTest):
 
 class TestGetReleases(OrloClientTest):
     DUMMY_JSON = {"message": "dummy json"}
-    DUMMY_JSON_S = str(DUMMY_JSON).replace("'", '"')  # Raw string for httpretty to return
+    # Raw string for httpretty to return:
+    DUMMY_JSON_S = str(DUMMY_JSON).replace("'", '"')
 
     RELEASE_JSON = {
         'releases': [
             {'id': str(uuid.uuid4())}
         ]}
-    RELEASE_JSON_S = str(RELEASE_JSON).replace("'", '"')  # Raw string for httpretty to return
+    # Raw string for httpretty to return:
+    RELEASE_JSON_S = str(RELEASE_JSON).replace("'", '"')
 
     @httpretty.activate
     def test_get_release_json_with_id(self):
@@ -47,7 +49,8 @@ class TestGetReleases(OrloClientTest):
         Test that we get back the correct raw json when calling get_release_json
         """
         httpretty.register_uri(
-                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
+                httpretty.GET,
+                '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
                 body=self.DUMMY_JSON_S,
                 status=200,
         )
@@ -76,7 +79,8 @@ class TestGetReleases(OrloClientTest):
         Test getting releases
         """
         httpretty.register_uri(
-                httpretty.GET, '{}/releases?foo=bar'.format(self.URI, self.RELEASE.release_id),
+                httpretty.GET,
+                '{}/releases?foo=bar'.format(self.URI, self.RELEASE.release_id),
                 body=self.RELEASE_JSON_S,
                 status=200,
         )
@@ -163,7 +167,8 @@ class CreateReleaseTest(OrloClientTest):
                 content_type='application/json',
         )
 
-        self.orlo.create_release(self.USER, self.PLATFORMS, references=self.REFERENCES)
+        self.orlo.create_release(
+            self.USER, self.PLATFORMS, references=self.REFERENCES)
 
         body = json.loads(httpretty.last_request().body)
         self.assertEqual(self.REFERENCES, body['references'])
@@ -197,7 +202,8 @@ class ReleaseStopTest(OrloClientTest):
         Test release_stop
         """
         httpretty.register_uri(
-                httpretty.POST, '{}/releases/{}/stop'.format(self.URI, self.RELEASE.release_id),
+                httpretty.POST,
+                '{}/releases/{}/stop'.format(self.URI, self.RELEASE.release_id),
                 status=204,
                 content_type='application/json',
         )
@@ -288,11 +294,13 @@ class ErrorTest(OrloClientTest):
         """
 
         httpretty.register_uri(
-                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
+                httpretty.GET,
+                '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
                 status=404,
                 content_type='application/json',
         )
-        self.assertRaises(OrloClientError, self.orlo.get_release, self.RELEASE.release_id)
+        self.assertRaises(
+            OrloClientError, self.orlo.get_release, self.RELEASE.release_id)
 
     @httpretty.activate
     def test_error_invalid_json(self):
@@ -301,11 +309,13 @@ class ErrorTest(OrloClientTest):
         """
 
         httpretty.register_uri(
-                httpretty.GET, '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
+                httpretty.GET,
+                '{}/releases/{}'.format(self.URI, self.RELEASE.release_id),
                 status=200,
                 body='{"foo": "bar"} this is not valid json',
         )
-        self.assertRaises(OrloClientError, self.orlo.get_release, self.RELEASE.release_id)
+        self.assertRaises(
+            OrloClientError, self.orlo.get_release, self.RELEASE.release_id)
 
 
 class InfoTest(OrloClientTest):
@@ -353,7 +363,8 @@ class InfoTest(OrloClientTest):
         """
 
         httpretty.register_uri(
-            httpretty.GET, '{}/info/users?platform={}'.format(self.URI, 'platform_one'),
+            httpretty.GET,
+            '{}/info/users?platform={}'.format(self.URI, 'platform_one'),
             status=200,
             content_type='application/json',
             body=json.dumps(self.DOC)
