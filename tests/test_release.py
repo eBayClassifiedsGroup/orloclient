@@ -1,7 +1,7 @@
 from __future__ import print_function
 from tests import OrloClientTest
 from orloclient.mock_orlo import MockOrloClient
-from orloclient import Release
+from orloclient import Release, Package
 from orloclient.exceptions import OrloClientError
 import arrow
 import uuid
@@ -76,3 +76,19 @@ class TestRelease(OrloClientTest):
         Test we get a list when calling the packages attribute
         """
         self.assertIsInstance(self.release.packages, list)
+
+    def test_release_deploy(self):
+        """
+        Test the deploy release function returns
+        """
+        self.assertIs(True, self.release.deploy())
+
+    def test_add_package(self):
+        """
+        Test adding a package
+        """
+        self.assertIsInstance(
+            self.release.add_package(
+                'test-package', '1.0.0'),
+            Package
+        )

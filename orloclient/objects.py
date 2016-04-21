@@ -101,7 +101,21 @@ class Release(object):
         self._data = self.client.get_release_json(self.release_id)
 
     def deploy(self):
-        raise NotImplementedError("Coming soon")
+        """
+        Issue the deploy command
+        """
+        status = self.client.deploy_release(self.release_id)
+        return status
+
+    def add_package(self, name, version):
+        """
+        Create a package and add it to this release
+
+        :param name:
+        :param version:
+        """
+        pkg = self.client.create_package(self, name, version)
+        return pkg
 
 
 class Package(object):

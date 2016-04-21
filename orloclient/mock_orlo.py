@@ -117,3 +117,7 @@ class MockOrloClient(object):
     @staticmethod
     def package_stop(*args, **kwargs):
         return True
+
+    @staticmethod
+    def deploy_release(*args, **kwargs):
+        return True

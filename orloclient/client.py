@@ -320,3 +320,25 @@ class OrloClient(object):
         )
         return response.json()
 
+    def deploy_release(self, release_id):
+        """
+        Send the command to deploy a release
+
+        :param release_id: Release ID to deploy
+        :return:
+        """
+        url = "{url}/releases/{rid}/deploy".format(url=self.uri, rid=release_id)
+
+        response = requests.post(
+            url, headers=self.headers, verify=self.verify_ssl,
+            allow_redirects=False,
+        )
+        self.logger.debug(response)
+
+        successful = self._expect_200_json_response(response)
+
+        if successful:
+            return True
+        else:
+            return False
+
