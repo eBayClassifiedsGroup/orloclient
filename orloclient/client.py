@@ -39,27 +39,26 @@ class OrloClient(object):
 
         if response.status_code == 204:
             return True
-
-        if response.status_code == status_code:
+        elif response.status_code == status_code:
             try:
                 return response.json()
             except ValueError:
-                raise OrloClientError("Could not decode json from Orlo response:\n{}".format(
-                    str(response.text)
-                ))
-
-        msg = "Orlo server returned code {code}:\n{text}".format(
-            code=response.status_code, text=response.text)
-
-        if response.status_code in (301, 302):
-            # Requests does not redo the post when receiving a redirect
-            # Thus, we use allow_redirect=False for POSTs which will result
-            # in the redirect appearing here
-            raise OrloServerError("Got redirect while attempting to POST")
-        elif response.status_code > 500:
-            raise OrloServerError(msg)
+                raise OrloClientError(
+                    "Could not decode json from Orlo response:\n{}".format(
+                        str(response.text)))
         else:
-            raise OrloClientError(msg)
+            msg = "Orlo server returned code {code}:\n{text}".format(
+                code=response.status_code, text=response.text)
+
+            if response.status_code in (301, 302):
+                # Requests does not redo the post when receiving a redirect
+                # Thus, we use allow_redirect=False for POSTs which will result
+                # in the redirect appearing here
+                raise OrloServerError("Got redirect while attempting to POST")
+            elif response.status_code >= 500:
+                raise OrloServerError(msg)
+            else:
+                raise OrloClientError(msg)
 
     def ping(self):
         response = requests.get(self.uri + '/ping', verify=self.verify_ssl)
