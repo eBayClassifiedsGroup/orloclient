@@ -22,7 +22,8 @@ class TestRelease(OrloClientTest):
 
     def test_release_id(self):
         """
-        Test that the release id returned matches the one from the mock and is a UUID
+        Test that the release id returned matches the one from the mock
+        and is a UUID
         """
         self.assertIsInstance(self.release.uuid, uuid.UUID)
         self.assertEqual(self.release.uuid, uuid.UUID(self.release_id))

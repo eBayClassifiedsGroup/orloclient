@@ -478,3 +478,20 @@ class DeployTest(OrloClientTest):
         result = self.orlo.deploy_release(rid)
         self.assertEqual(True, result)
 
+
+class VersionsTest(OrloClientTest):
+    @httpretty.activate
+    def test_version(self):
+        """
+        Test /versions
+        """
+        expected = {"package_one": "1.2.3"}
+        httpretty.register_uri(
+            httpretty.GET, '{}/info/packages/versions'.format(self.URI),
+            status=200,
+            content_type='application/json',
+            body=json.dumps(expected)
+        )
+
+        result = self.orlo.get_versions()
+        self.assertEqual(expected, result)

@@ -86,3 +86,7 @@ class TestMockOrlo(TestCase):
     def test_deploy_release(self):
         result = self.mock_client.deploy_release(str(uuid.uuid4()))
         self.assertIs(result, True)
+
+    def test_get_versions(self):
+        result = self.mock_client.get_versions()
+        self.assertIsInstance(result, dict)

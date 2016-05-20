@@ -121,3 +121,7 @@ class MockOrloClient(object):
     @staticmethod
     def deploy_release(*args, **kwargs):
         return True
+
+    @staticmethod
+    def get_versions():
+        return {'package_one': '1.2.3'}

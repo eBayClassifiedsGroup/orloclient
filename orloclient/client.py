@@ -130,8 +130,7 @@ class OrloClient(object):
 
         response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
         self.logger.debug(response)
-        r = self._expect_200_json_response(response)
-        return r
+        return self._expect_200_json_response(response)
 
     def create_release(self, user, platforms,
                        team=None, references=None, note=None):
@@ -291,7 +290,7 @@ class OrloClient(object):
         response = requests.get(
             '{uri}/info/{field}{name}'.format(**url_path), params=url_query
         )
-        return response.json()
+        return self._expect_200_json_response(response)
 
     def get_stats(self, field=None, name=None, platform=None, stime=None, ftime=None):
         """
@@ -320,7 +319,7 @@ class OrloClient(object):
         response = requests.get(
             '{uri}/stats{field}{name}'.format(**url_path), params=url_query
         )
-        return response.json()
+        return self._expect_200_json_response(response)
 
     def deploy_release(self, release_id):
         """
@@ -337,10 +336,20 @@ class OrloClient(object):
         )
         self.logger.debug(response)
 
-        successful = self._expect_200_json_response(response)
+        return self._expect_200_json_response(response)
 
-        if successful:
-            return True
-        else:
-            return False
+    def get_versions(self):
+        """
+        Return a JSON document of all package versions
+
+        :return:
+        """
+        url = "{url}/info/packages/versions".format(url=self.uri)
+
+        response = requests.get(
+            url, headers=self.headers, verify=self.verify_ssl
+        )
+        self.logger.debug(response)
+
+        return self._expect_200_json_response(response)
 
