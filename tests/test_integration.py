@@ -41,7 +41,7 @@ class OrloLiveServerTest(LiveServerTestCase):
         return self.orlo_client.create_release('testuser', ['testplatform'])
 
     def _create_package(self, release):
-        return self.orlo_client.create_package(release, 'testName', '1.2.3')
+        return self.orlo_client.create_package(release, 'package_one', '1.2.3')
 
     def _package_start(self, package):
         return self.orlo_client.package_start(package)
@@ -130,7 +130,7 @@ class TestOrloRead(OrloLiveServerTest):
         Test get_releases with a filter on package_name
         """
         self._setup_release()
-        releases = self.orlo_client.get_releases(package_name='testName')
+        releases = self.orlo_client.get_releases(package_name='package_one')
         self.assertIsInstance(releases[0], Release)
 
     def test_get_releases_user(self):

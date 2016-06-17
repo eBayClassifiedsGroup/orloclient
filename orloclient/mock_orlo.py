@@ -18,7 +18,7 @@ class MockOrloClient(object):
     """
     example_package_dict = {
         "status": "SUCCESSFUL",
-        "name": "testName",
+        "name": "package_one",
         "version": "1.2.3",
         "ftime": "2015-11-27T11:32:34Z",
         "stime": "2015-11-27T11:32:34Z",
