@@ -75,7 +75,7 @@ class OrloClient(object):
         :param release_id:
         :return:
         """
-        
+
         response_dict = self.get_release_json(release_id)
         self.logger.debug(response_dict)
 
@@ -133,7 +133,7 @@ class OrloClient(object):
         return self._expect_200_json_response(response)
 
     def create_release(self, user, platforms,
-                       team=None, references=None, note=None):
+                       team=None, references=None, note=None, metadata=None):
         """
         Create a release using the REST API
         :param string user: User performing the release
@@ -141,6 +141,7 @@ class OrloClient(object):
         :param string team: Team responsible for the release
         :param list references: List of strings, external references, e.g. Jira ticket
         :param string note: Free-text field for additional information
+        :param dict metadata: dictionary containing arbitrary data
         """
 
         data = {
@@ -154,6 +155,8 @@ class OrloClient(object):
             data['references'] = references
         if note:
             data['note'] = note
+        if metadata:
+            data['metadata'] = metadata
 
         req_url = '{}/releases'.format(self.uri)
         self.logger.debug("Posting to {}:\n{}".format(req_url, data))
@@ -352,4 +355,3 @@ class OrloClient(object):
         self.logger.debug(response)
 
         return self._expect_200_json_response(response)
-
