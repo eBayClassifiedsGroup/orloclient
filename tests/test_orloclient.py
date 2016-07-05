@@ -61,7 +61,9 @@ class TestGetReleases(OrloClientTest):
     @httpretty.activate
     def test_get_release(self):
         """
-        Test getting a release by ID. Would probably depend on the above json test passing.
+        Test getting a release by ID
+
+        Would probably depend on the above json test passing.
         """
         rid = self.RELEASE_JSON['releases'][0]['id']
         httpretty.register_uri(
@@ -109,6 +111,92 @@ class TestGetReleases(OrloClientTest):
         )
 
         self.orlo.get_releases(user='test_string')
+        self.assertEqual(
+            httpretty.last_request().querystring['user'],
+            ['test_string']
+        )
+
+
+class TestGetPackages(OrloClientTest):
+    DUMMY_JSON = {"message": "dummy json"}
+    # Raw string for httpretty to return:
+    DUMMY_JSON_S = str(DUMMY_JSON).replace("'", '"')
+
+    PACKAGE_JSON = {
+        'packages': [
+            {'id': str(uuid.uuid4()), 'name': 'package-one', 'version': '1.0'}
+        ]}
+    # Raw string for httpretty to return:
+    PACKAGE_JSON_S = str(PACKAGE_JSON).replace("'", '"')
+
+    @httpretty.activate
+    def test_get_package_json_with_id(self):
+        """
+        Test that we get back the correct raw json when calling get_package_json
+        """
+        httpretty.register_uri(
+            httpretty.GET,
+            '{}/packages/{}'.format(self.URI, self.PACKAGE.id),
+            body=self.DUMMY_JSON_S,
+            status=200,
+        )
+
+        response = self.orlo.get_package_json(self.PACKAGE.id)
+        self.assertEqual(response['message'], self.DUMMY_JSON['message'])
+
+    @httpretty.activate
+    def test_get_package(self):
+        """
+        Test getting a package by ID
+
+        Would probably depend on the above json test passing.
+        """
+        rid = self.PACKAGE_JSON['packages'][0]['id']
+        httpretty.register_uri(
+            httpretty.GET, '{}/packages/{}'.format(self.URI, rid),
+            body=self.PACKAGE_JSON_S,
+            status=200,
+        )
+
+        result = self.orlo.get_package(rid)
+        self.assertEqual(result.id, str(rid))
+
+    @httpretty.activate
+    def test_get_packages(self):
+        """
+        Test getting packages
+        """
+        httpretty.register_uri(
+            httpretty.GET,
+            '{}/packages?foo=bar'.format(self.URI, self.PACKAGE.id),
+            body=self.PACKAGE_JSON_S,
+            status=200,
+        )
+
+        package_list = self.orlo.get_packages(foo='bar')
+        self.assertEqual(package_list[0].id, self.PACKAGE_JSON['packages'][0]['id'])
+
+    def test_get_packages_unfiltered_raises(self):
+        """
+        Test that get/packages without a filter raises OrloClientError
+        """
+        with self.assertRaises(OrloClientError):
+            self.orlo.get_packages()
+
+    @httpretty.activate
+    def test_get_packages_filter(self):
+        """
+        Test that we pass through a filter to the request
+
+        If the argument user=foo doesn't make it into the request this test will fail
+        """
+        httpretty.register_uri(
+            httpretty.GET, '{}/packages'.format(self.URI),
+            body=self.PACKAGE_JSON_S,
+            status=200,
+        )
+
+        self.orlo.get_packages(user='test_string')
         self.assertEqual(
             httpretty.last_request().querystring['user'],
             ['test_string']

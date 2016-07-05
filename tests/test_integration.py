@@ -158,3 +158,7 @@ class TestOrloRead(OrloLiveServerTest):
         self.assertIsInstance(releases, list)
         self.assertEqual(0, len(releases))
 
+    def test_get_packages(self):
+        self._setup_release()
+        packages = self.orlo_client.get_packages(name='package_one')
+        print(packages[0].as_dict())

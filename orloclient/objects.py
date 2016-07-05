@@ -130,4 +130,11 @@ class Package(object):
         self.release_id = release_id
         self.version = version
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'release_id': self.release_id,
+            'version': self.version,
+        }
 

@@ -35,7 +35,8 @@ class OrloClient(object):
         :param int status_code: The expected status_code
         :return dict:
         """
-        self.logger.debug("Response {}:\n{}".format(response.status_code, response.text))
+        self.logger.debug("Response {}:\n{}".format(
+            response.status_code, response.text))
 
         if response.status_code == 204:
             return True
@@ -79,7 +80,9 @@ class OrloClient(object):
         response_dict = self.get_release_json(release_id)
         self.logger.debug(response_dict)
 
-        releases_list = [Release(self, r['id']) for r in response_dict['releases']]
+        releases_list = [
+            Release(self, r['id']) for r in response_dict['releases']
+        ]
         if len(releases_list) > 1:
             raise OrloServerError("Got list of length > 1")
 
@@ -120,13 +123,27 @@ class OrloClient(object):
 
     def get_release_json(self, release_id):
         """
-        Fetch a releases from the orlo API
+        Fetch a release from the orlo API
 
         :param release_id:
         :returns dict:
         """
-        self.logger.debug("Entering get_releases")
+        self.logger.debug("Entering get_release_json")
         url = "{url}/releases/{rid}".format(url=self.uri, rid=release_id)
+
+        response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
+        self.logger.debug(response)
+        return self._expect_200_json_response(response)
+
+    def get_package_json(self, package_id):
+        """
+        Fetch a package from the orlo API
+
+        :param package_id:
+        :return:
+        """
+        self.logger.debug("Entering get_package_json")
+        url = "{url}/packages/{pid}".format(url=self.uri, pid=package_id)
 
         response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
         self.logger.debug(response)
@@ -222,6 +239,62 @@ class OrloClient(object):
         )
 
         return self._expect_200_json_response(response, status_code=204)
+
+    def get_package(self, package_id):
+        """
+        Fetch a single Package
+
+        :param package_id:
+        """
+
+        response_dict = self.get_package_json(package_id)
+        self.logger.debug(response_dict)
+
+        print(response_dict)
+        packages_list = [
+            Package(None, p['id'], p['name'], p['version'])
+            for p in response_dict['packages']
+            ]
+        if len(packages_list) > 1:
+            raise OrloServerError("Got list of length > 1")
+
+        return packages_list[0]
+
+    def get_packages(self, **kwargs):
+        """
+        Fetch packages from the orlo API with filters
+
+        http://orlo.readthedocs.org/en/latest/rest.html#get--packages
+        :param kwargs: Filters to apply
+        """
+        self.logger.debug("Entering get_packages")
+
+        if len(kwargs) is 0:
+            msg = "Must specify at least one filter for packages"
+            raise OrloClientError(msg)
+
+        url = "{url}/packages".format(url=self.uri)
+
+        filters = []
+
+        for key in kwargs:
+            f = "{}={}".format(key, kwargs[key])
+            self.logger.debug("Append filter {}".format(f))
+            filters.append(f)
+
+        if filters:
+            url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
+
+        response = requests.get(url, headers=self.headers, verify=self.verify_ssl)
+        self.logger.debug(response)
+
+        response_dict = self._expect_200_json_response(response)
+        packages_list = [
+            Package(None, p['id'], p['name'], p['version'])
+            for p in response_dict['packages']
+        ]
+
+        return packages_list
 
     def package_start(self, package):
         """
