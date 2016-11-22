@@ -26,7 +26,7 @@ setup(
     tests_require=[
         'Flask-Testing',
         'httpretty',
-        'orlo >= 0.2.0rc3',
+        'orlo >= 0.3.0',
     ],
     test_suite='tests',
 )
