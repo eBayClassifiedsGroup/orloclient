@@ -28,5 +28,9 @@ setup(
         'httpretty',
         'orlo >= 0.3.0',
     ],
-    test_suite='tests',
+    entry_points={
+        'console_scripts': [
+            'orloclient=orloclient.__main__:main'
+        ]
+    },
 )

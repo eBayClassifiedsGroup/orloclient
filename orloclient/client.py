@@ -250,7 +250,6 @@ class OrloClient(object):
         response_dict = self.get_package_json(package_id)
         self.logger.debug(response_dict)
 
-        print(response_dict)
         packages_list = [
             Package(None, p['id'], p['name'], p['version'])
             for p in response_dict['packages']
