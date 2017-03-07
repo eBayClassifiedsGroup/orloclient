@@ -1,7 +1,7 @@
 from __future__ import print_function
 import httpretty
 import json
-from orloclient import OrloClientError, OrloServerError
+from orloclient import ClientError, ServerError
 from tests import OrloClientTest
 import uuid
 
@@ -94,7 +94,7 @@ class TestGetReleases(OrloClientTest):
         """
         Test that get/releases without a filter raises OrloClientError
         """
-        with self.assertRaises(OrloClientError):
+        with self.assertRaises(ClientError):
             self.orlo.get_releases()
 
     @httpretty.activate
@@ -180,7 +180,7 @@ class TestGetPackages(OrloClientTest):
         """
         Test that get/packages without a filter raises OrloClientError
         """
-        with self.assertRaises(OrloClientError):
+        with self.assertRaises(ClientError):
             self.orlo.get_packages()
 
     @httpretty.activate
@@ -388,7 +388,7 @@ class ErrorTest(OrloClientTest):
                 content_type='application/json',
         )
         self.assertRaises(
-            OrloClientError, self.orlo.get_release, self.RELEASE.release_id)
+            ClientError, self.orlo.get_release, self.RELEASE.release_id)
 
     @httpretty.activate
     def test_error_invalid_json(self):
@@ -403,7 +403,7 @@ class ErrorTest(OrloClientTest):
                 body='{"foo": "bar"} this is not valid json',
         )
         self.assertRaises(
-            OrloClientError, self.orlo.get_release, self.RELEASE.release_id)
+            ClientError, self.orlo.get_release, self.RELEASE.release_id)
 
 
 class InfoTest(OrloClientTest):

@@ -2,7 +2,7 @@ from __future__ import print_function
 from tests import OrloClientTest
 from orloclient.mock_orlo import MockOrloClient
 from orloclient import Package, Release
-from orloclient.exceptions import OrloClientError
+from orloclient.exceptions import ClientError
 import arrow
 import uuid
 

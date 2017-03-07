@@ -2,7 +2,7 @@ from __future__ import print_function
 import logging
 import requests
 
-from .exceptions import OrloClientError, OrloServerError
+from .exceptions import ClientError, ServerError, ConnectionError
 from .objects import Release, Package
 
 __author__ = 'alforbes'
@@ -44,7 +44,7 @@ class OrloClient(object):
             try:
                 return response.json()
             except ValueError:
-                raise OrloClientError(
+                raise ClientError(
                     "Could not decode json from Orlo response:\n{}".format(
                         str(response.text)))
         else:
@@ -55,11 +55,11 @@ class OrloClient(object):
                 # Requests does not redo the post when receiving a redirect
                 # Thus, we use allow_redirect=False for POSTs which will result
                 # in the redirect appearing here
-                raise OrloServerError("Got redirect while attempting to POST")
+                raise ServerError("Got redirect while attempting to POST")
             elif response.status_code >= 500:
-                raise OrloServerError(msg)
+                raise ServerError(msg)
             else:
-                raise OrloClientError(msg)
+                raise ClientError(msg)
 
     def ping(self):
         response = requests.get(self.uri + '/ping', verify=self.verify_ssl)
@@ -84,7 +84,7 @@ class OrloClient(object):
             Release(self, r['id']) for r in response_dict['releases']
         ]
         if len(releases_list) > 1:
-            raise OrloServerError("Got list of length > 1")
+            raise ServerError("Got list of length > 1")
 
         return releases_list[0]
 
@@ -99,7 +99,7 @@ class OrloClient(object):
 
         if len(kwargs) is 0:
             msg = "Must specify at least one filter for releases"
-            raise OrloClientError(msg)
+            raise ClientError(msg)
 
         url = "{url}/releases".format(url=self.uri)
 
@@ -255,7 +255,7 @@ class OrloClient(object):
             for p in response_dict['packages']
             ]
         if len(packages_list) > 1:
-            raise OrloServerError("Got list of length > 1")
+            raise ServerError("Got list of length > 1")
 
         return packages_list[0]
 
@@ -270,7 +270,7 @@ class OrloClient(object):
 
         if len(kwargs) is 0:
             msg = "Must specify at least one filter for packages"
-            raise OrloClientError(msg)
+            raise ClientError(msg)
 
         url = "{url}/packages".format(url=self.uri)
 
@@ -313,7 +313,7 @@ class OrloClient(object):
 
         if response.status_code != 204:
             self.logger.debug(response)
-            raise OrloServerError(
+            raise ServerError(
                 "Orlo server returned non-204 status code: {}".format(response.json()))
 
         return self._expect_200_json_response(response, status_code=204)

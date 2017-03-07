@@ -1,5 +1,5 @@
 from __future__ import print_function
-from .exceptions import OrloClientError
+from .exceptions import ClientError
 import json
 import arrow
 import uuid
@@ -67,10 +67,10 @@ class Release(object):
             # The data returned by Orlo is a JSON structure, containing a list
             # of releases, even though there can only be one
             if len(self._data['releases']) > 1:
-                raise OrloClientError("Expected one release in dictionary")
+                raise ClientError("Expected one release in dictionary")
             value = self._data['releases'][0][item]
         except KeyError:
-            raise OrloClientError("This object does not have attribute '{}'\n{}".format(
+            raise ClientError("This object does not have attribute '{}'\n{}".format(
                 item, json.dumps(self._data, indent=2)
             ))
 

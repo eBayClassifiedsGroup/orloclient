@@ -1,7 +1,7 @@
 from __future__ import print_function
 from .config import config
 from .client import OrloClient
-from .exceptions import OrloClientError, OrloServerError
+from .exceptions import ClientError, ServerError
 from .objects import Release, Package
 from .mock_orlo import MockOrloClient
 from pkg_resources import get_distribution

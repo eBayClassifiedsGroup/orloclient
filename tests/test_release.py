@@ -2,7 +2,7 @@ from __future__ import print_function
 from tests import OrloClientTest
 from orloclient.mock_orlo import MockOrloClient
 from orloclient import Release, Package
-from orloclient.exceptions import OrloClientError
+from orloclient.exceptions import ClientError
 import arrow
 import uuid
 
@@ -32,7 +32,7 @@ class TestRelease(OrloClientTest):
         """
         Test that we get KeyError when a bad attribute is requested
         """
-        with self.assertRaises(OrloClientError):
+        with self.assertRaises(ClientError):
             return self.release.bad_attribute_19847
 
     def test_release_stime(self):
