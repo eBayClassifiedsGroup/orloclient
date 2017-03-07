@@ -93,6 +93,17 @@ class MockOrloClient(object):
         }
         return json.dumps(response)
 
+    def get_package(self, *args, **kwargs):
+        return self.example_package
+
+    def get_packages(self, *args, **kwargs):
+        return [self.example_package]
+
+    def get_package_json(self, release_id):
+        return {
+            'packages': [self.example_package_dict]
+        }
+
     def create_release(self, *args, **kwargs):
         return self.example_release
 
