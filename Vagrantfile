@@ -82,7 +82,7 @@ Vagrant.configure(2) do |config|
   SHELL
 
   config.vm.define "jessie" do |jessie|
-    jessie.vm.box = "bento/debian-8.6"
+    jessie.vm.box = "bento/debian-8.7"
     jessie.vm.network "forwarded_port", guest: 5000, host: 6134
     jessie.vm.network "private_network", ip: "192.168.57.20"
   end
