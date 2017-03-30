@@ -12,6 +12,7 @@ tests_require=[
     'Flask-Testing',
     'httpretty',
     'orlo >= 0.3.0',
+    'pytest',
 ]
 
 
