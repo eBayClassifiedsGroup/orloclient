@@ -8,6 +8,13 @@ __author__ = 'alforbes'
 from setuptools import setup, find_packages
 import multiprocessing  # nopep8
 
+tests_require=[
+    'Flask-Testing',
+    'httpretty',
+    'orlo >= 0.3.0',
+]
+
+
 setup(
     name='orloclient',
     version='0.3.0',
@@ -23,11 +30,8 @@ setup(
         'arrow',
         'requests',
     ],
-    tests_require=[
-        'Flask-Testing',
-        'httpretty',
-        'orlo >= 0.3.0',
-    ],
+    extras_require={'test': tests_require},
+    tests_require=tests_require,
     entry_points={
         'console_scripts': [
             'orloclient=orloclient.__main__:main'
