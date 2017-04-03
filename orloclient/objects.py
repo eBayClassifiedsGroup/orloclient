@@ -136,6 +136,6 @@ class Package(object):
             'version': self.version,
         }
 
-    def as_dict(self):
+    def to_dict(self):
         return self.data
 

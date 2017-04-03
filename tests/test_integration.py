@@ -161,4 +161,4 @@ class TestOrloRead(OrloLiveServerTest):
     def test_get_packages(self):
         self._setup_release()
         packages = self.orlo_client.get_packages(name='package_one')
-        print(packages[0].as_dict())
+        print(packages[0].to_dict())

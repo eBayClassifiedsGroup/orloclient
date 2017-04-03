@@ -13,6 +13,7 @@ tests_require=[
     'httpretty',
     'orlo >= 0.3.0',
     'pytest',
+    'mock',
 ]
 
 

@@ -65,16 +65,19 @@ class MockOrloClient(object):
         self.uri = uri
         self.verify_ssl = verify_ssl
 
-        self.example_release = Release(
-            self, self.example_release_dict['id']
-        )
-
         self.example_package = Package(
             self.example_release_dict['id'],
             self.example_package_dict['id'],
             self.example_package_dict['name'],
             self.example_package_dict['version'],
         )
+
+        self.example_release = Release(
+            client=self,
+            release_id=self.example_release_dict['id'],
+        )
+
+        self.example_release.packages = [self.example_package]
 
     def ping(self):
         return True

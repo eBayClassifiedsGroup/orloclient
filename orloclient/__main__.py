@@ -2,8 +2,9 @@ from __future__ import print_function
 import argparse
 import logging
 import json
+import uuid
 from orloclient import __version__
-from orloclient import OrloClient, Release, Package
+from orloclient import OrloClient
 
 __author__ = 'alforbes'
 
@@ -60,7 +61,8 @@ def action_start(client, args):
 
     logger.info(json.dumps(
         [
-            p for p in release.package if p.id == package.id
+            p.to_dict() for p in release.packages \
+                if p.id == uuid.UUID(package.id)
         ][0]
     ))
 
@@ -74,7 +76,8 @@ def action_stop(client, args):
 
     logger.info(json.dumps(
         [
-            p for p in release.package if p.id == package.id
+            p.to_dict() for p in release.packages \
+            if p.id == uuid.UUID(package.id)
             ][0]
     ))
 
@@ -112,10 +115,10 @@ def main():
         '-t', '--team', help='Team field value', required=False
     )
     pp_create_release.add_argument(
-        '-r', '--references', help='References field value', type=dict,
+        '-r', '--references', help='References field value', nargs='+',
     )
     pp_create_release.add_argument(
-        '-n', '--note', help='Note field value', type=dict,
+        '-n', '--note', help='Note field value',
     )
 
     pp_create_package = argparse.ArgumentParser(add_help=False)
