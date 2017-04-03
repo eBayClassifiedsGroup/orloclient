@@ -17,3 +17,8 @@ class ServerError(OrloError):
 
 class ConnectionError(OrloError):
     """ Connection Error """
+
+
+# Legacy exceptions for backwards compatibility
+OrloClientError = ClientError
+OrloServerError = ServerError
