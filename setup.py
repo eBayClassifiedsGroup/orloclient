@@ -18,7 +18,7 @@ tests_require=[
 
 setup(
     name='orloclient',
-    version='0.3.0',
+    version='0.3.1',
     description='Client to the Orlo deployment _data capture API',
     author='Alex Forbes',
     author_email='alforbes@ebay.com',
