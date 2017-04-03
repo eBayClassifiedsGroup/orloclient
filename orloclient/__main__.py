@@ -9,7 +9,7 @@ from orloclient import OrloClient
 __author__ = 'alforbes'
 
 logging.basicConfig(format='%(message)s')
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('orloclient')
 logger.setLevel(logging.INFO)
 
 

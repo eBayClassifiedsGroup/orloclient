@@ -6,6 +6,7 @@ from .exceptions import ClientError, ServerError, ConnectionError
 from .objects import Release, Package
 
 __author__ = 'alforbes'
+logger = logging.getLogger(__name__)
 
 
 class OrloClient(object):
@@ -21,7 +22,6 @@ class OrloClient(object):
     """
 
     def __init__(self, uri, verify_ssl=True):
-        self.logger = logging.getLogger(__name__)
         self.uri = uri
         self.verify_ssl = verify_ssl
 
@@ -33,7 +33,7 @@ class OrloClient(object):
         :param int status_code: The expected status_code
         :return dict:
         """
-        self.logger.debug("Response {}:\n{}".format(
+        logger.debug("Response {}:\n{}".format(
             response.status_code, response.text))
 
         if response.status_code == 204:
@@ -76,7 +76,7 @@ class OrloClient(object):
         """
 
         response_dict = self.get_release_json(release_id)
-        self.logger.debug(response_dict)
+        logger.debug(response_dict)
 
         releases_list = [
             Release(self, r['id']) for r in response_dict['releases']
@@ -93,7 +93,7 @@ class OrloClient(object):
         http://orlo.readthedocs.org/en/latest/rest.html#get--releases
         :param kwargs: Filters to apply
         """
-        self.logger.debug("Entering get_releases")
+        logger.debug("Entering get_releases")
 
         if len(kwargs) is 0:
             msg = "Must specify at least one filter for releases"
@@ -105,14 +105,14 @@ class OrloClient(object):
 
         for key in kwargs:
             f = "{}={}".format(key, kwargs[key])
-            self.logger.debug("Append filter {}".format(f))
+            logger.debug("Append filter {}".format(f))
             filters.append(f)
 
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
 
         response = get(url, verify=self.verify_ssl)
-        self.logger.debug(response)
+        logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
         releases_list = [Release(self, r['id']) for r in response_dict['releases']]
@@ -126,11 +126,11 @@ class OrloClient(object):
         :param release_id:
         :returns dict:
         """
-        self.logger.debug("Entering get_release_json")
+        logger.debug("Entering get_release_json")
         url = "{url}/releases/{rid}".format(url=self.uri, rid=release_id)
 
         response = get(url, verify=self.verify_ssl)
-        self.logger.debug(response)
+        logger.debug(response)
         return self._expect_200_json_response(response)
 
     def get_package_json(self, package_id):
@@ -140,11 +140,11 @@ class OrloClient(object):
         :param package_id:
         :return:
         """
-        self.logger.debug("Entering get_package_json")
+        logger.debug("Entering get_package_json")
         url = "{url}/packages/{pid}".format(url=self.uri, pid=package_id)
 
         response = get(url, verify=self.verify_ssl)
-        self.logger.debug(response)
+        logger.debug(response)
         return self._expect_200_json_response(response)
 
     def create_release(self, user, platforms,
@@ -174,7 +174,7 @@ class OrloClient(object):
             data['metadata'] = metadata
 
         req_url = '{}/releases'.format(self.uri)
-        self.logger.debug("Posting to {}:\n{}".format(req_url, data))
+        logger.debug("Posting to {}:\n{}".format(req_url, data))
         response = post(
             req_url,
             json=data,
@@ -243,7 +243,7 @@ class OrloClient(object):
         """
 
         response_dict = self.get_package_json(package_id)
-        self.logger.debug(response_dict)
+        logger.debug(response_dict)
 
         packages_list = [
             Package(None, p['id'], p['name'], p['version'])
@@ -261,7 +261,7 @@ class OrloClient(object):
         http://orlo.readthedocs.org/en/latest/rest.html#get--packages
         :param kwargs: Filters to apply
         """
-        self.logger.debug("Entering get_packages")
+        logger.debug("Entering get_packages")
 
         if len(kwargs) is 0:
             msg = "Must specify at least one filter for packages"
@@ -273,14 +273,14 @@ class OrloClient(object):
 
         for key in kwargs:
             f = "{}={}".format(key, kwargs[key])
-            self.logger.debug("Append filter {}".format(f))
+            logger.debug("Append filter {}".format(f))
             filters.append(f)
 
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
 
         response = get(url, verify=self.verify_ssl)
-        self.logger.debug(response)
+        logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
         packages_list = [
@@ -306,7 +306,7 @@ class OrloClient(object):
         )
 
         if response.status_code != 204:
-            self.logger.debug(response)
+            logger.debug(response)
             raise ServerError(
                 "Orlo server returned non-204 status code: {}".format(response.json()))
 
@@ -402,7 +402,7 @@ class OrloClient(object):
             url, verify=self.verify_ssl,
             allow_redirects=False,
         )
-        self.logger.debug(response)
+        logger.debug(response)
 
         return self._expect_200_json_response(response)
 
@@ -417,6 +417,6 @@ class OrloClient(object):
         response = get(
             url, verify=self.verify_ssl
         )
-        self.logger.debug(response)
+        logger.debug(response)
 
         return self._expect_200_json_response(response)
