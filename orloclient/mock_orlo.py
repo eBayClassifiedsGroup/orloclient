@@ -16,6 +16,8 @@ class MockOrloClient(object):
 
     Will return values from the example objects below.
     """
+    release_id = str(uuid.uuid4())
+
     example_package_dict = {
         "status": "SUCCESSFUL",
         "name": "package_one",
@@ -25,7 +27,7 @@ class MockOrloClient(object):
         "duration": 0,
         "diff_url": None,
         "id": str(uuid.uuid4()),
-        "release_id": str(uuid.uuid4()),
+        "release_id": release_id,
     }
 
     example_release_dict = {
@@ -38,7 +40,7 @@ class MockOrloClient(object):
         "duration": 0,
         "references": [],
         "packages": [example_package_dict],
-        "id": str(uuid.uuid4()),
+        "id": release_id,
         "user": "testuser",
         "metadata": {"env": "test", "pool": "web"}
     }

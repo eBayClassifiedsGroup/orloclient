@@ -315,11 +315,12 @@ class ReleaseStopTest(OrloClientTest):
         """
         Test release_stop
         """
+        url = '{}/releases/{}/stop'.format(self.URI, self.RELEASE.release_id)
         httpretty.register_uri(
-                httpretty.POST,
-                '{}/releases/{}/stop'.format(self.URI, self.RELEASE.release_id),
-                status=204,
-                content_type='application/json',
+            httpretty.POST,
+            url,
+            status=204,
+            content_type='application/json',
         )
 
         self.assertEqual(self.orlo.release_stop(self.RELEASE), True)
@@ -335,16 +336,17 @@ class WorkflowTest(OrloClientTest):
         """
         Test package_start
         """
+        url = '{}/releases/{}/packages/{}/start'.format(
+            self.URI, self.PACKAGE.release_id, self.PACKAGE.id)
         httpretty.register_uri(
-                httpretty.POST, '{}/releases/{}/packages/{}/start'.format(
-                        self.URI, self.RELEASE.release_id, self.PACKAGE.id),
-                status=204,
-                content_type='application/json',
+            httpretty.POST, url,
+            status=204,
+            content_type='application/json',
         )
 
         self.assertEqual(
-                self.orlo.package_start(self.PACKAGE),
-                True)
+            self.orlo.package_start(self.PACKAGE),
+            True)
 
     @httpretty.activate
     def test_package_stop(self):
@@ -352,14 +354,14 @@ class WorkflowTest(OrloClientTest):
         Test package_stop
         """
         httpretty.register_uri(
-                httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
-                        self.URI, self.RELEASE.release_id, self.PACKAGE.id),
-                status=204,
-                content_type='application/json',
+            httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
+                    self.URI, self.PACKAGE.release_id, self.PACKAGE.id),
+            status=204,
+            content_type='application/json',
         )
 
         self.assertEqual(
-                self.orlo.package_stop(self.PACKAGE), True)
+            self.orlo.package_stop(self.PACKAGE), True)
 
     @httpretty.activate
     def test_package_stop_with_success_true(self):
@@ -367,10 +369,10 @@ class WorkflowTest(OrloClientTest):
         Test package_stop with success=True
         """
         httpretty.register_uri(
-                httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
-                        self.URI, self.RELEASE.release_id, self.PACKAGE.id),
-                status=204,
-                content_type='application/json',
+            httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
+                self.URI, self.PACKAGE.release_id, self.PACKAGE.id),
+            status=204,
+            content_type='application/json',
         )
 
         self.orlo.package_stop(self.PACKAGE, success=True)
@@ -384,10 +386,10 @@ class WorkflowTest(OrloClientTest):
         Test package_stop with success=False
         """
         httpretty.register_uri(
-                httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
-                        self.URI, self.RELEASE.release_id, self.PACKAGE.id),
-                status=204,
-                content_type='application/json',
+            httpretty.POST, '{}/releases/{}/packages/{}/stop'.format(
+                self.URI, self.PACKAGE.release_id, self.PACKAGE.id),
+            status=204,
+            content_type='application/json',
         )
 
         self.orlo.package_stop(self.PACKAGE, success=False)
