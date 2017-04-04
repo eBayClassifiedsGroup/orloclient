@@ -1,5 +1,6 @@
 from __future__ import print_function
 import logging
+import json
 from _requests import get, post
 
 from .exceptions import ClientError, ServerError, ConnectionError
@@ -243,10 +244,11 @@ class OrloClient(object):
         """
 
         response_dict = self.get_package_json(package_id)
-        logger.debug(response_dict)
+        logger.debug('Response Dict:\n{}'.format(
+            json.dumps(response_dict, indent=2)))
 
         packages_list = [
-            Package(None, p['id'], p['name'], p['version'])
+            Package(p['release_id'], p['id'], p['name'], p['version'])
             for p in response_dict['packages']
             ]
         if len(packages_list) > 1:

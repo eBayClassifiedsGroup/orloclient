@@ -4,6 +4,7 @@ import json
 from orloclient import ClientError, ServerError
 from tests import OrloClientTest
 import uuid
+import logging
 
 __author__ = 'alforbes'
 
@@ -13,6 +14,8 @@ test_orloclient.py
 This file mocks the request library, hence it is a test of the client only, and
 not its integration with the orlo server
 '''
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class TestOrloBase(OrloClientTest):
@@ -124,7 +127,12 @@ class TestGetPackages(OrloClientTest):
 
     PACKAGE_JSON = {
         'packages': [
-            {'id': str(uuid.uuid4()), 'name': 'package-one', 'version': '1.0'}
+            {
+                'id': str(uuid.uuid4()),
+                'release_id': str(uuid.uuid4()),
+                'name': 'package-one',
+                'version': '1.0',
+            }
         ]}
     # Raw string for httpretty to return:
     PACKAGE_JSON_S = str(PACKAGE_JSON).replace("'", '"')
@@ -160,6 +168,24 @@ class TestGetPackages(OrloClientTest):
 
         result = self.orlo.get_package(rid)
         self.assertEqual(result.id, str(rid))
+
+    @httpretty.activate
+    def test_get_package_release_id_not_None(self):
+        """
+        Test getting a package by ID
+
+        Would probably depend on the above json test passing.
+        """
+        rid = self.PACKAGE_JSON['packages'][0]['id']
+        httpretty.register_uri(
+            httpretty.GET, '{}/packages/{}'.format(self.URI, rid),
+            body=self.PACKAGE_JSON_S,
+            status=200,
+        )
+
+        result = self.orlo.get_package(rid)
+        print(result.to_dict())
+        self.assertIsNotNone(result.release_id)
 
     @httpretty.activate
     def test_get_packages(self):

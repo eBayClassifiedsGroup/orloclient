@@ -24,7 +24,8 @@ class MockOrloClient(object):
         "stime": "2015-11-27T11:32:34Z",
         "duration": 0,
         "diff_url": None,
-        "id": str(uuid.uuid4())
+        "id": str(uuid.uuid4()),
+        "release_id": str(uuid.uuid4()),
     }
 
     example_release_dict = {
