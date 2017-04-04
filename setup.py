@@ -11,7 +11,7 @@ import multiprocessing  # nopep8
 tests_require=[
     'Flask-Testing',
     'httpretty',
-    'orlo >= 0.3.0',
+    'orlo >= 0.4.0',
     'pytest',
     'mock',
 ]
