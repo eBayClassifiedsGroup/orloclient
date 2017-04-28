@@ -1,7 +1,7 @@
 import unittest
 import uuid
 import orloclient
-from .test_mock import MockOrloClient
+from test_mock import MockOrloClient
 from mock import patch
 import logging
 
