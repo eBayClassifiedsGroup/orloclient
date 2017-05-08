@@ -62,14 +62,23 @@ Vagrant.configure(2) do |config|
     dpkg -i /tmp/dh-virtualenv_1.0-1_all.deb
     apt-get -f install -y
 
-    # Setup a virtualenv; avoids conflicts, particularly with python-six
-    virtualenv /home/vagrant/virtualenv/orlo
-    source /home/vagrant/virtualenv/orlo/bin/activate
-    echo "source ~/virtualenv/orlo/bin/activate" >> /home/vagrant/.profile
 
-    pip install -r /vagrant/orloclient/requirements.txt
-    pip install -r /vagrant/orloclient/requirements_testing.txt
-    pip install -r /vagrant/orloclient/docs/requirements.txt
+    # Setup virtualenvs; avoids conflicts, particularly with python-six
+    virtualenv /home/vagrant/virtualenv/orlo_py27 --python=python2.7
+    source /home/vagrant/virtualenv/orlo_py27/bin/activate
+    cd /vagrant/orlo
+    pip install .[test]
+    pip install .[doc]
+    python setup.py develop
+
+    virtualenv /home/vagrant/virtualenv/orlo_py34 --python=python3.4
+    source /home/vagrant/virtualenv/orlo_py34/bin/activate
+    cd /vagrant/orlo
+    pip install .[test]
+    pip install .[doc]
+    python setup.py develop
+
+    echo "source ~/virtualenv/orlo_py34/bin/activate" >> /home/vagrant/.profile
 
     mkdir -p /etc/orlo /var/log/orlo
     chown -R vagrant:root /etc/orlo /var/log/orlo
