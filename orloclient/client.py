@@ -1,7 +1,7 @@
 from __future__ import print_function
 import logging
 import json
-from _requests import get, post
+from base_client import BaseClient
 
 from .exceptions import ClientError, ServerError, ConnectionError
 from .objects import Release, Package
@@ -10,7 +10,8 @@ __author__ = 'alforbes'
 logger = logging.getLogger(__name__)
 
 
-class OrloClient(object):
+
+class OrloClient(BaseClient):
     """
     Reference object to our Orlo server
 
@@ -61,7 +62,7 @@ class OrloClient(object):
                 raise ClientError(msg)
 
     def ping(self):
-        response = get(self.uri + '/ping', verify=self.verify_ssl)
+        response = self._get(self.uri + '/ping', verify=self.verify_ssl)
 
         if response.status_code == 200:
             return True
@@ -112,7 +113,7 @@ class OrloClient(object):
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
 
-        response = get(url, verify=self.verify_ssl)
+        response = self._get(url, verify=self.verify_ssl)
         logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
@@ -130,7 +131,7 @@ class OrloClient(object):
         logger.debug("Entering get_release_json")
         url = "{url}/releases/{rid}".format(url=self.uri, rid=release_id)
 
-        response = get(url, verify=self.verify_ssl)
+        response = self._get(url, verify=self.verify_ssl)
         logger.debug(response)
         return self._expect_200_json_response(response)
 
@@ -144,7 +145,7 @@ class OrloClient(object):
         logger.debug("Entering get_package_json")
         url = "{url}/packages/{pid}".format(url=self.uri, pid=package_id)
 
-        response = get(url, verify=self.verify_ssl)
+        response = self._get(url, verify=self.verify_ssl)
         logger.debug(response)
         return self._expect_200_json_response(response)
 
@@ -176,7 +177,7 @@ class OrloClient(object):
 
         req_url = '{}/releases'.format(self.uri)
         logger.debug("Posting to {}:\n{}".format(req_url, data))
-        response = post(
+        response = self._post(
             req_url,
             json=data,
             verify=self.verify_ssl,
@@ -198,7 +199,7 @@ class OrloClient(object):
         :return: package id
         """
 
-        response = post(
+        response = self._post(
             '{}/releases/{}/packages'.format(self.uri, release.release_id),
             json={
                 'name': name,
@@ -228,7 +229,7 @@ class OrloClient(object):
         :returns boolean: Whether or not the release was successfully stopped
         """
         release_id = release.release_id
-        response = post(
+        response = self._post(
             '{}/releases/{}/stop'.format(self.uri, release_id),
             verify=self.verify_ssl,
             allow_redirects=False,
@@ -281,7 +282,7 @@ class OrloClient(object):
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
 
-        response = get(url, verify=self.verify_ssl)
+        response = self._get(url, verify=self.verify_ssl)
         logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
@@ -300,7 +301,7 @@ class OrloClient(object):
         :return boolean: Whether or not the package was successfully started
         """
 
-        response = post(
+        response = self._post(
             '{}/releases/{}/packages/{}/start'.format(
                 self.uri, package.release_id, package.id),
             verify=self.verify_ssl,
@@ -325,7 +326,7 @@ class OrloClient(object):
         release_id = package.release_id
         package_id = package.id
 
-        response = post(
+        response = self._post(
             '{}/releases/{}/packages/{}/stop'.format(
                 self.uri, release_id, package_id),
             json={
@@ -357,7 +358,7 @@ class OrloClient(object):
 
         url_query = {'platform': platform} if platform else {}
 
-        response = get(
+        response = self._get(
             '{uri}/info/{field}{name}'.format(**url_path), params=url_query
         )
         return self._expect_200_json_response(response)
@@ -386,7 +387,7 @@ class OrloClient(object):
         for var in ['platform', 'stime', 'ftime']:
             url_query[var] = eval(var)
 
-        response = get(
+        response = self._get(
             '{uri}/stats{field}{name}'.format(**url_path), params=url_query
         )
         return self._expect_200_json_response(response)
@@ -400,7 +401,7 @@ class OrloClient(object):
         """
         url = "{url}/releases/{rid}/deploy".format(url=self.uri, rid=release_id)
 
-        response = post(
+        response = self._post(
             url, verify=self.verify_ssl,
             allow_redirects=False,
         )
@@ -416,7 +417,7 @@ class OrloClient(object):
         """
         url = "{url}/info/packages/versions".format(url=self.uri)
 
-        response = get(
+        response = self._get(
             url, verify=self.verify_ssl
         )
         logger.debug(response)
