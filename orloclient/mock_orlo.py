@@ -64,9 +64,8 @@ class MockOrloClient(object):
         }
     }
 
-    def __init__(self, uri, verify_ssl=True):
+    def __init__(self, uri, timeout=10, verify_ssl=True):
         self.uri = uri
-        self.verify_ssl = verify_ssl
 
         self.example_package = Package(
             self.example_release_dict['id'],

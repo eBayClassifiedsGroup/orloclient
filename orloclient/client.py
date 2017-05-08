@@ -29,7 +29,6 @@ class OrloClient(BaseClient):
             verify_ssl=verify_ssl,
         )
         self.uri = uri
-        self.verify_ssl = verify_ssl
 
     def _expect_200_json_response(self, response, status_code=200):
         """
