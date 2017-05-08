@@ -23,8 +23,9 @@ class OrloClient(BaseClient):
     use the mock.
     """
 
-    def __init__(self, uri, verify_ssl=True):
+    def __init__(self, uri, timeout=10, verify_ssl=True):
         super(OrloClient, self).__init__(
+            timeout=timeout,
             verify_ssl=verify_ssl,
         )
         self.uri = uri

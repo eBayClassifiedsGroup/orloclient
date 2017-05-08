@@ -18,7 +18,7 @@ OrloError.
 
 
 class BaseClient(object):
-    def __init__(self, timeout=5, verify_ssl=True):
+    def __init__(self, timeout=10, verify_ssl=True):
         self.request_args = {
             'timeout': timeout,
             'verify': verify_ssl
