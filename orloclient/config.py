@@ -1,8 +1,8 @@
 from __future__ import print_function
-import ConfigParser
+from six.moves import configparser
 
 __author__ = 'alforbes'
 
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 

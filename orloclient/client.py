@@ -1,7 +1,7 @@
 from __future__ import print_function
 import logging
 import json
-from base_client import BaseClient
+from .base_client import BaseClient
 
 from .exceptions import ClientError, ServerError, ConnectionError
 from .objects import Release, Package
