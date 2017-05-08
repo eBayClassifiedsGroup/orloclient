@@ -15,6 +15,10 @@ tests_require=[
     'pytest',
     'mock',
 ]
+install_requires = [
+    'arrow',
+    'requests',
+]
 
 
 setup(
@@ -28,11 +32,9 @@ setup(
     url='https://github.com/eBayClassifiedsGroup/orloclient',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        'arrow',
-        'requests',
-    ],
-    extras_require={'test': tests_require},
+    install_requires=install_requires,
+    extras_require={'test': tests_require,
+                    'install': install_requires},
     tests_require=tests_require,
     entry_points={
         'console_scripts': [
