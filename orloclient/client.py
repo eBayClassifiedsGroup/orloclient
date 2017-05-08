@@ -24,6 +24,9 @@ class OrloClient(BaseClient):
     """
 
     def __init__(self, uri, verify_ssl=True):
+        super(OrloClient, self).__init__(
+            verify_ssl=verify_ssl,
+        )
         self.uri = uri
         self.verify_ssl = verify_ssl
 
@@ -62,7 +65,7 @@ class OrloClient(BaseClient):
                 raise ClientError(msg)
 
     def ping(self):
-        response = self._get(self.uri + '/ping', verify=self.verify_ssl)
+        response = self._get(self.uri + '/ping')
 
         if response.status_code == 200:
             return True
@@ -113,7 +116,7 @@ class OrloClient(BaseClient):
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
 
-        response = self._get(url, verify=self.verify_ssl)
+        response = self._get(url)
         logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
@@ -131,7 +134,7 @@ class OrloClient(BaseClient):
         logger.debug("Entering get_release_json")
         url = "{url}/releases/{rid}".format(url=self.uri, rid=release_id)
 
-        response = self._get(url, verify=self.verify_ssl)
+        response = self._get(url)
         logger.debug(response)
         return self._expect_200_json_response(response)
 
@@ -145,7 +148,7 @@ class OrloClient(BaseClient):
         logger.debug("Entering get_package_json")
         url = "{url}/packages/{pid}".format(url=self.uri, pid=package_id)
 
-        response = self._get(url, verify=self.verify_ssl)
+        response = self._get(url)
         logger.debug(response)
         return self._expect_200_json_response(response)
 
@@ -180,7 +183,6 @@ class OrloClient(BaseClient):
         response = self._post(
             req_url,
             json=data,
-            verify=self.verify_ssl,
             allow_redirects=False,
         )
 
@@ -205,7 +207,6 @@ class OrloClient(BaseClient):
                 'name': name,
                 'version': version,
             },
-            verify=self.verify_ssl,
             allow_redirects=False,
         )
 
@@ -231,7 +232,6 @@ class OrloClient(BaseClient):
         release_id = release.release_id
         response = self._post(
             '{}/releases/{}/stop'.format(self.uri, release_id),
-            verify=self.verify_ssl,
             allow_redirects=False,
         )
 
@@ -282,7 +282,7 @@ class OrloClient(BaseClient):
         if filters:
             url = "{url}?{filters}".format(url=url, filters='&'.join(filters))
 
-        response = self._get(url, verify=self.verify_ssl)
+        response = self._get(url)
         logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
@@ -304,7 +304,6 @@ class OrloClient(BaseClient):
         response = self._post(
             '{}/releases/{}/packages/{}/start'.format(
                 self.uri, package.release_id, package.id),
-            verify=self.verify_ssl,
             allow_redirects=False,
         )
 
@@ -332,7 +331,6 @@ class OrloClient(BaseClient):
             json={
                 'success': success,
             },
-            verify=self.verify_ssl,
             allow_redirects=False,
         )
 
@@ -401,10 +399,7 @@ class OrloClient(BaseClient):
         """
         url = "{url}/releases/{rid}/deploy".format(url=self.uri, rid=release_id)
 
-        response = self._post(
-            url, verify=self.verify_ssl,
-            allow_redirects=False,
-        )
+        response = self._post(url, allow_redirects=False)
         logger.debug(response)
 
         return self._expect_200_json_response(response)
@@ -417,9 +412,7 @@ class OrloClient(BaseClient):
         """
         url = "{url}/info/packages/versions".format(url=self.uri)
 
-        response = self._get(
-            url, verify=self.verify_ssl
-        )
+        response = self._get(url)
         logger.debug(response)
 
         return self._expect_200_json_response(response)

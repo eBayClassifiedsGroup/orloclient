@@ -15,15 +15,29 @@ OrloError.
 """
 
 # Always dealing with JSON, so this is hard-coded
-headers = {'Content-Type': 'application/json'}
 
 
 class BaseClient(object):
+    def __init__(self, timeout=5, verify_ssl=True):
+        self.request_args = {
+            'timeout': timeout,
+            'verify': verify_ssl
+        }
+        self.get_headers = {'Content-Type': 'application/json'}
+
     def _get(self, *args, **kwargs):
-        """ Wrapper for exception handling """
+        """
+        Wraps a GET request with standard parameters
+        """
         try:
-            logger.debug("Get args: {}, kwargs: {}".format(args, kwargs))
-            return requests.get(*args, headers=headers, **kwargs)
+            req_kw_args = self.request_args.copy()
+            req_kw_args.update(kwargs)
+            logger.debug("Get args: {}, kwargs: {}".format(args, req_kw_args))
+            return requests.get(
+                *args,
+                headers=self.get_headers,
+                **req_kw_args
+            )
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.ConnectTimeout) as e:
             logger.debug('Requests exception: {}\n{}'.format(
@@ -42,10 +56,17 @@ class BaseClient(object):
 
 
     def _post(self, *args, **kwargs):
-        """ Wrapper for exception handling """
+        """
+        Wraps a POST request with standard parameters
+        """
         try:
-            logger.debug("Post args: {}, kwargs: {}".format(args, kwargs))
-            return requests.post(*args, headers=headers, **kwargs)
+            req_kw_args = self.request_args.copy()
+            req_kw_args.update(kwargs)
+            logger.debug("Post args: {}, kwargs: {}".format(args, req_kw_args))
+            return requests.post(
+                *args,
+                **req_kw_args
+            )
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.ConnectTimeout):
             raise ConnectionError(
