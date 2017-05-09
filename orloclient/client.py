@@ -336,6 +336,31 @@ class OrloClient(BaseClient):
 
         return self._expect_200_json_response(response, status_code=204)
 
+
+    def package_add_results(self, package, results):
+        """
+        Add results to a package
+
+        :param Package package: Package object
+        :param String results: The results string that you want to add to the package
+        :return boolean: Whether or not the package was successfully updated
+        """
+        release_id = package.release_id
+        package_id = package.id
+
+        response = requests.post(
+            '{}/releases/{}/packages/{}/results'.format(
+                self.uri, release_id, package_id),
+            json={
+                'content': results,
+            },
+            headers=self.headers,
+            verify=self.verify_ssl,
+            allow_redirects=False,
+        )
+
+        return self._expect_200_json_response(response, status_code=204)
+
     def get_info(self, field, name=None, platform=None):
         """
         Fetch from the /info endpoint
