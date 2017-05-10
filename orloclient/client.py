@@ -91,18 +91,16 @@ class OrloClient(BaseClient):
 
         return releases_list[0]
 
-    def get_releases(self, **kwargs):
+    def get_releases(self, raw=False, **kwargs):
         """
         Fetch releases from the orlo API with filters
 
-        http://orlo.readthedocs.org/en/latest/rest.html#get--releases
+        See http://orlo.readthedocs.org/en/latest/rest.html#get--releases
+
+        :param bool raw: Return the raw dictionary rather than Release objects
         :param kwargs: Filters to apply
         """
         logger.debug("Entering get_releases")
-
-        if len(kwargs) is 0:
-            msg = "Must specify at least one filter for releases"
-            raise ClientError(msg)
 
         url = "{url}/releases".format(url=self.uri)
 
@@ -120,9 +118,12 @@ class OrloClient(BaseClient):
         logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
-        releases_list = [Release(self, r['id']) for r in response_dict['releases']]
 
-        return releases_list
+        if raw:
+            return response_dict['releases']
+        else:
+            return [Release(self, r['id']) for r in response_dict['releases']]
+
 
     def get_release_json(self, release_id):
         """
@@ -413,20 +414,6 @@ class OrloClient(BaseClient):
         )
         return self._expect_200_json_response(response)
 
-    def deploy_release(self, release_id):
-        """
-        Send the command to deploy a release
-
-        :param release_id: Release ID to deploy
-        :return:
-        """
-        url = "{url}/releases/{rid}/deploy".format(url=self.uri, rid=release_id)
-
-        response = self._post(url, allow_redirects=False)
-        logger.debug(response)
-
-        return self._expect_200_json_response(response)
-
     def get_versions(self):
         """
         Return a JSON document of all package versions
@@ -439,3 +426,4 @@ class OrloClient(BaseClient):
         logger.debug(response)
 
         return self._expect_200_json_response(response)
+

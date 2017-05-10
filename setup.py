@@ -23,7 +23,7 @@ install_requires = [
 
 setup(
     name='orloclient',
-    version='0.4.3',
+    version='0.4.4',
     description='Client to the Orlo deployment _data capture API',
     author='Alex Forbes',
     author_email='alforbes@ebay.com',

@@ -93,13 +93,6 @@ class TestGetReleases(OrloClientTest):
         release_list = self.orlo.get_releases(foo='bar')
         self.assertEqual(release_list[0].id, self.RELEASE_JSON['releases'][0]['id'])
 
-    def test_get_releases_unfiltered_raises(self):
-        """
-        Test that get/releases without a filter raises OrloClientError
-        """
-        with self.assertRaises(ClientError):
-            self.orlo.get_releases()
-
     @httpretty.activate
     def test_get_releases_filter(self):
         """
@@ -590,25 +583,6 @@ class StatsTest(OrloClientTest):
         self.assertEqual(
             httpretty.last_request().querystring, {'platform': ['platformOne']})
         self.assertEqual(self.DOC, result)
-
-
-class DeployTest(OrloClientTest):
-    @httpretty.activate
-    def test_deploy(self):
-        """
-        Test /release/{rid}/deploy
-        """
-        rid = uuid.uuid4()
-        httpretty.register_uri(
-            httpretty.POST, '{}/releases/{}/deploy'.format(
-                self.URI,
-                rid),
-            status=204,
-            content_type='application/json',
-        )
-
-        result = self.orlo.deploy_release(rid)
-        self.assertEqual(True, result)
 
 
 class VersionsTest(OrloClientTest):
