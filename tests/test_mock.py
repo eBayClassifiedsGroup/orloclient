@@ -31,6 +31,9 @@ def get_callables(obj):
 class TestMockOrlo(TestCase):
     """
     Ensure that the mock is updated whenever the client changes...
+
+    If you encounter a test failure here, you probably need to add your
+    function to the mock. See orloclient/mock_orlo.py :)
     """
 
     functions = get_callables(OrloClient)
