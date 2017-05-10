@@ -364,6 +364,22 @@ class WorkflowTest(OrloClientTest):
             self.orlo.package_stop(self.PACKAGE), True)
 
     @httpretty.activate
+    def test_package_add_results(self):
+        """
+        Test package_add_results
+        """
+        httpretty.register_uri(
+                httpretty.POST, '{}/releases/{}/packages/{}/results'.format(
+                        self.URI, self.PACKAGE.release_id, self.PACKAGE.id),
+                status=204,
+                content_type='application/json',
+        )
+
+        self.assertEqual(
+                self.orlo.package_add_results(self.PACKAGE, results='test results'), True)
+
+
+    @httpretty.activate
     def test_package_stop_with_success_true(self):
         """
         Test package_stop with success=True

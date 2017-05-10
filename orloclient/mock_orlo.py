@@ -135,6 +135,10 @@ class MockOrloClient(object):
         return True
 
     @staticmethod
+    def package_add_results(*args, **kwargs):
+        return True
+
+    @staticmethod
     def deploy_release(*args, **kwargs):
         return True
 
