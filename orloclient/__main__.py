@@ -176,19 +176,19 @@ def main():
     pp_create_package.add_argument('version', help='Package version')
 
     subparsers.add_parser(
-        'create_release', help='Create a release',
+        'create-release', help='Create a release',
         parents=[pp_create_release]
     ).set_defaults(func=action_create_release)
     subparsers.add_parser(
-        'create_package', help='Create a package',
+        'create-package', help='Create a package',
         parents=[pp_release, pp_create_package]
     ).set_defaults(func=action_create_package)
     subparsers.add_parser(
-        'get_release', help='Fetch a release by ID',
+        'get-release', help='Fetch a release by ID',
         parents=[pp_release]
     ).set_defaults(func=action_get_release)
     subparsers.add_parser(
-        'get_package', help='Fetch a package by id',
+        'get-package', help='Fetch a package by id',
         parents=[pp_package]
     ).set_defaults(func=action_get_package)
     subparsers.add_parser(
@@ -200,7 +200,7 @@ def main():
         parents=[pp_package]
     ).set_defaults(func=action_stop)
     subparsers.add_parser(
-        'list_releases', help='List releases, filters optional',
+        'list', help='List releases, filters optional',
         parents=[pp_list]
     ).set_defaults(func=action_list_releases)
 
