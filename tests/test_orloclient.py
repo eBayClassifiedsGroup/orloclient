@@ -370,7 +370,7 @@ class WorkflowTest(OrloClientTest):
         """
         httpretty.register_uri(
                 httpretty.POST, '{}/releases/{}/packages/{}/results'.format(
-                        self.URI, self.RELEASE.release_id, self.PACKAGE.id),
+                        self.URI, self.PACKAGE.release_id, self.PACKAGE.id),
                 status=204,
                 content_type='application/json',
         )
