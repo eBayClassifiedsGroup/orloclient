@@ -2,15 +2,33 @@ from __future__ import print_function
 import argparse
 import logging
 import json
+import sys
 import uuid
+from os.path import expanduser
 from orloclient import __version__
 from orloclient import OrloClient
+
+if sys.version_info >= (3, 0):
+    from configparser import ConfigParser
+else:
+    from ConfigParser import ConfigParser
+
 
 __author__ = 'alforbes'
 
 logging.basicConfig(format='%(message)s')
 logger = logging.getLogger('orloclient')
 logger.setLevel(logging.INFO)
+
+
+config = ConfigParser()
+config.add_section('client')
+config.set('client', 'uri', 'http://localhost:5000')
+config.read([
+    '/etc/orlo/orlo.ini',
+    expanduser('~/.orlo.ini'),
+    'orlo.ini',
+])
 
 
 def action_get_release(client, args):
@@ -107,9 +125,9 @@ def main():
     parser.add_argument('--version', '-v', action='version',
                         version='%(prog)s {}'.format(__version__))
     parser.add_argument('--uri', '-u', dest='uri',
-                        default='http://localhost:5000',
+                        default=config.get('client', 'uri'),
                         help="Address of orlo server")
-    parser.add_argument('--debug', help='Enable debug logging',
+    parser.add_argument('--debug', '-d', help='Enable debug logging',
                         action='store_true')
 
     subparsers = parser.add_subparsers(dest='object')
