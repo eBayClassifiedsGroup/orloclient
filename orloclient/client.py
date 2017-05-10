@@ -91,11 +91,13 @@ class OrloClient(BaseClient):
 
         return releases_list[0]
 
-    def get_releases(self, **kwargs):
+    def get_releases(self, raw=False, **kwargs):
         """
         Fetch releases from the orlo API with filters
 
-        http://orlo.readthedocs.org/en/latest/rest.html#get--releases
+        See http://orlo.readthedocs.org/en/latest/rest.html#get--releases
+
+        :param bool raw: Return the raw dictionary rather than Release objects
         :param kwargs: Filters to apply
         """
         logger.debug("Entering get_releases")
@@ -116,9 +118,12 @@ class OrloClient(BaseClient):
         logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
-        releases_list = [Release(self, r['id']) for r in response_dict['releases']]
 
-        return releases_list
+        if raw:
+            return response_dict['releases']
+        else:
+            return [Release(self, r['id']) for r in response_dict['releases']]
+
 
     def get_release_json(self, release_id):
         """
