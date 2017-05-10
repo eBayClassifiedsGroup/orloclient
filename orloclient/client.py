@@ -100,10 +100,6 @@ class OrloClient(BaseClient):
         """
         logger.debug("Entering get_releases")
 
-        if len(kwargs) is 0:
-            msg = "Must specify at least one filter for releases"
-            raise ClientError(msg)
-
         url = "{url}/releases".format(url=self.uri)
 
         filters = []

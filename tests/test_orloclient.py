@@ -93,13 +93,6 @@ class TestGetReleases(OrloClientTest):
         release_list = self.orlo.get_releases(foo='bar')
         self.assertEqual(release_list[0].id, self.RELEASE_JSON['releases'][0]['id'])
 
-    def test_get_releases_unfiltered_raises(self):
-        """
-        Test that get/releases without a filter raises OrloClientError
-        """
-        with self.assertRaises(ClientError):
-            self.orlo.get_releases()
-
     @httpretty.activate
     def test_get_releases_filter(self):
         """
