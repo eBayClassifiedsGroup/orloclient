@@ -413,20 +413,6 @@ class OrloClient(BaseClient):
         )
         return self._expect_200_json_response(response)
 
-    def deploy_release(self, release_id):
-        """
-        Send the command to deploy a release
-
-        :param release_id: Release ID to deploy
-        :return:
-        """
-        url = "{url}/releases/{rid}/deploy".format(url=self.uri, rid=release_id)
-
-        response = self._post(url, allow_redirects=False)
-        logger.debug(response)
-
-        return self._expect_200_json_response(response)
-
     def get_versions(self):
         """
         Return a JSON document of all package versions
@@ -439,3 +425,4 @@ class OrloClient(BaseClient):
         logger.debug(response)
 
         return self._expect_200_json_response(response)
+

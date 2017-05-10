@@ -592,25 +592,6 @@ class StatsTest(OrloClientTest):
         self.assertEqual(self.DOC, result)
 
 
-class DeployTest(OrloClientTest):
-    @httpretty.activate
-    def test_deploy(self):
-        """
-        Test /release/{rid}/deploy
-        """
-        rid = uuid.uuid4()
-        httpretty.register_uri(
-            httpretty.POST, '{}/releases/{}/deploy'.format(
-                self.URI,
-                rid),
-            status=204,
-            content_type='application/json',
-        )
-
-        result = self.orlo.deploy_release(rid)
-        self.assertEqual(True, result)
-
-
 class VersionsTest(OrloClientTest):
     @httpretty.activate
     def test_version(self):
