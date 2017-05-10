@@ -348,14 +348,12 @@ class OrloClient(BaseClient):
         release_id = package.release_id
         package_id = package.id
 
-        response = requests.post(
+        response = self._post(
             '{}/releases/{}/packages/{}/results'.format(
                 self.uri, release_id, package_id),
             json={
                 'content': results,
             },
-            headers=self.headers,
-            verify=self.verify_ssl,
             allow_redirects=False,
         )
 
