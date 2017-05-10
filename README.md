@@ -1,15 +1,79 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [orloclient](#orloclient)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Command-line Usage](#command-line-usage)
+  - [Usage in Python](#usage-in-python)
+  - [Tests](#tests)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # orloclient
 
 Python client for the [Orlo](https://github.com/eBayClassifiedsGroup/orlo) server.
 
-# Installation
+## Installation
 ```
 pip install orloclient
 ```
 
-# Usage
+## Configuration
 
-With an Orlo server running on localhost:5000:
+If orlo server is on the same box, put a section in /etc/orlo.ini:
+```
+[client]
+uri=http://orlo.host
+```
+
+Otherwise, orloclient will read the ini file above from `~/.orlo.ini` or `./orlo.ini`.
+
+This is the only configuration at present and is not required, it just saves you from
+constantly having to type `--uri http://orlo.host` on the command line.
+
+## Command-line Usage
+
+With an Orlo server running on localhost:5000, and client/uri configured in orlo.ini:
+
+```
+$ orloclient create-release -p test -u alex
+Created release with id e42a478f-cc08-42e9-a9fb-c98ec65c414d
+
+$ orloclient create-package e42a478f-cc08-42e9-a9fb-c98ec65c414d test-package 1.0.0
+Created package with id 7510ffc0-4f0e-4fc1-925f-96ecb84e6db8
+
+$ orloclient start 7510ffc0-4f0e-4fc1-925f-96ecb84e6db8
+
+$ orloclient stop 7510ffc0-4f0e-4fc1-925f-96ecb84e6db8
+
+$ orloclient list
+[
+  {
+    "user": "alex",
+    "platforms": [
+      "test"
+    ],
+    "packages": [
+      {
+        "status": "SUCCESSFUL",
+        "release_id": "e42a478f-cc08-42e9-a9fb-c98ec65c414d",
+        "id": "7510ffc0-4f0e-4fc1-925f-96ecb84e6db8",
+        {...}
+      }
+    ],
+    {..}
+  }
+]
+
+```
+
+See `orloclient -h` for more details.
+
+
+## Usage in Python
+
 ```python
 vagrant@debian-jessie:/vagrant$ ipython
 Python 2.7.9 (default, Mar  1 2015, 12:57:24)
@@ -72,6 +136,6 @@ In [9]: print(json.dumps(doc, indent=2))
 }
 ```
 
-# Tests
+## Tests
 
 There are two test suites, test_orloclient and test_integration. The former tests the orlo client functions while mocking the requests library, courtesy of [HTTPretty](https://github.com/gabrielfalcao/HTTPretty), while the integration tests run an actual Orlo server to test against.
