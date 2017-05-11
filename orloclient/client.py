@@ -415,13 +415,16 @@ class OrloClient(BaseClient):
         )
         return self._expect_200_json_response(response)
 
-    def get_versions(self):
+    def get_versions(self, platform=None):
         """
         Return a JSON document of all package versions
 
         :return:
         """
-        url = "{url}/info/packages/versions".format(url=self.uri)
+        url = "{url}/info/packages/versions{platform}".format(
+            url=self.uri,
+            platform=platform if platform else ''
+        )
 
         response = self._get(url)
         logger.debug(response)

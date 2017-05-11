@@ -141,6 +141,11 @@ def action_info(client, args):
     print(json.dumps(out, indent=2))
 
 
+def action_versions(client, args):
+    out = client.get_versions(platform=args.platform)
+    print(json.dumps(out, indent=2))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', '-v', action='version',
@@ -216,6 +221,10 @@ def main():
                           '(both time-before and time-after filter on the '
                           '"stime" [start time] field).')
 
+
+    pp_versions = argparse.ArgumentParser(add_help=False)
+    pp_versions.add_argument('--platform', help='Platform to filter on')
+
     pp_create_package = argparse.ArgumentParser(add_help=False)
     pp_create_package.add_argument('name', help='Package name')
     pp_create_package.add_argument('version', help='Package version')
@@ -256,6 +265,10 @@ def main():
         'info', help='Fetch release info',
         parents=[pp_info]
     ).set_defaults(func=action_info)
+    subparsers.add_parser(
+        'versions', help='Fetch current package versions',
+        parents=[pp_versions]
+    ).set_defaults(func=action_versions)
 
     args = parser.parse_args()
     if args.debug:
