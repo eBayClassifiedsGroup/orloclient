@@ -28,7 +28,7 @@ setup(
     author='Alex Forbes',
     author_email='alforbes@ebay.com',
     license='GPL',
-    long_description=open(os.path.join(os.getcwd(), 'README.md')).read(),
+    long_description=open(os.path.join(os.getcwd(), 'README.rst')).read(),
     url='https://github.com/eBayClassifiedsGroup/orloclient',
     packages=find_packages(),
     include_package_data=True,
