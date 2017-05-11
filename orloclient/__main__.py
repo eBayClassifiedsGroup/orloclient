@@ -132,6 +132,15 @@ def action_stats(client, args):
     print(json.dumps(out, indent=2))
 
 
+def action_info(client, args):
+    out = client.get_info(
+        field=args.field,
+        name=args.name,
+        platform=args.platform,
+    )
+    print(json.dumps(out, indent=2))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', '-v', action='version',
@@ -187,6 +196,13 @@ def main():
        help="Only print id values, not full release json"
     )
 
+    pp_info = argparse.ArgumentParser(add_help=False)
+    pp_info.add_argument('field', help='Field to report on',
+                         choices=('users', 'teams', 'packages', 'platforms'))
+    pp_info.add_argument('--name', help='The subject or field entry, e.g if '
+                                        'field is user, name could be "alex"')
+    pp_info.add_argument('--platform', help='Platform to filter on.')
+
     pp_stats = argparse.ArgumentParser(add_help=False)
     pp_stats.add_argument('--field', help='Field to report on',
                           choices=('user', 'team', 'package', 'platform'))
@@ -236,6 +252,10 @@ def main():
         'stats', help='Fetch release stats',
         parents=[pp_stats]
     ).set_defaults(func=action_stats)
+    subparsers.add_parser(
+        'info', help='Fetch release info',
+        parents=[pp_info]
+    ).set_defaults(func=action_info)
 
     args = parser.parse_args()
     if args.debug:
