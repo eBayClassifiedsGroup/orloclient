@@ -24,6 +24,7 @@ logger.setLevel(logging.INFO)
 config = ConfigParser()
 config.add_section('client')
 config.set('client', 'uri', 'http://localhost:5000')
+config.set('client', 'verify_ssl', 'true')
 config.read([
     '/etc/orlo/orlo.ini',
     expanduser('~/.orlo.ini'),
@@ -100,7 +101,7 @@ def action_stop(client, args):
     ))
 
 
-def action_list_releases(client, args):
+def action_list(client, args):
     logger.debug('Filters: {}'.format(str(args.filter)))
     kwargs = {}
 
@@ -112,12 +113,40 @@ def action_list_releases(client, args):
         kwargs[l[0]] = l[1]
 
 
-    releases = client.get_releases(raw=True, **kwargs)
+    if args.packages:
+        out = client.get_packages(raw=True, **kwargs)
+    else:
+        out = client.get_releases(raw=True, **kwargs)
 
     if args.id_only:
-        print(json.dumps([r['id'] for r in releases], indent=2))
+        print(json.dumps([item['id'] for item in out], indent=2))
     else:
-        print(json.dumps(releases, indent=2))
+        print(json.dumps(out, indent=2))
+
+
+def action_stats(client, args):
+    out = client.get_stats(
+        field=args.field,
+        name=args.name,
+        platform=args.platform,
+        stime=args.time_after,
+        ftime=args.time_before,
+    )
+    print(json.dumps(out, indent=2))
+
+
+def action_info(client, args):
+    out = client.get_info(
+        field=args.field,
+        name=args.name,
+        platform=args.platform,
+    )
+    print(json.dumps(out, indent=2))
+
+
+def action_versions(client, args):
+    out = client.get_versions(platform=args.platform)
+    print(json.dumps(out, indent=2))
 
 
 def main():
@@ -129,6 +158,10 @@ def main():
                         help="Address of orlo server")
     parser.add_argument('--debug', '-d', help='Enable debug logging',
                         action='store_true')
+    parser.add_argument(
+        '--insecure', '-I', action='store_true',
+        default=False if config.getboolean('client', 'verify_ssl') else True,
+        help='Do not verify SSL/TLS connections')
 
     subparsers = parser.add_subparsers(dest='object')
     pp_package = argparse.ArgumentParser(add_help=False)
@@ -167,9 +200,38 @@ def main():
              "for valid parameters"
     )
     pp_list.add_argument(
+        '-p', '--packages', action='store_true',
+        help="By default we list releases, this switches to listing "
+             "packages instead"
+    )
+    pp_list.add_argument(
         '-i', '--id-only', action='store_true',
        help="Only print id values, not full release json"
     )
+
+    pp_info = argparse.ArgumentParser(add_help=False)
+    pp_info.add_argument('field', help='Field to report on',
+                         choices=('users', 'teams', 'packages', 'platforms'))
+    pp_info.add_argument('--name', help='The subject or field entry, e.g if '
+                                        'field is user, name could be "alex"')
+    pp_info.add_argument('--platform', help='Platform to filter on.')
+
+    pp_stats = argparse.ArgumentParser(add_help=False)
+    pp_stats.add_argument('--field', help='Field to report on',
+                          choices=('user', 'team', 'package', 'platform'))
+    pp_stats.add_argument('--name', help='The subject or field entry, e.g if '
+                                         'field is user, name could be "alex"')
+    pp_stats.add_argument('--platform', help='Platform to filter on.')
+    pp_stats.add_argument('--time-before', metavar='TIME',
+                          help='Filter by releases started before this time')
+    pp_stats.add_argument('--time-after', metavar='TIME',
+                          help='Filter by releases started after this time'
+                          '(both time-before and time-after filter on the '
+                          '"stime" [start time] field).')
+
+
+    pp_versions = argparse.ArgumentParser(add_help=False)
+    pp_versions.add_argument('--platform', help='Platform to filter on')
 
     pp_create_package = argparse.ArgumentParser(add_help=False)
     pp_create_package.add_argument('name', help='Package name')
@@ -202,7 +264,19 @@ def main():
     subparsers.add_parser(
         'list', help='List releases, filters optional',
         parents=[pp_list]
-    ).set_defaults(func=action_list_releases)
+    ).set_defaults(func=action_list)
+    subparsers.add_parser(
+        'stats', help='Fetch release stats',
+        parents=[pp_stats]
+    ).set_defaults(func=action_stats)
+    subparsers.add_parser(
+        'info', help='Fetch release info',
+        parents=[pp_info]
+    ).set_defaults(func=action_info)
+    subparsers.add_parser(
+        'versions', help='Fetch current package versions',
+        parents=[pp_versions]
+    ).set_defaults(func=action_versions)
 
     args = parser.parse_args()
     if args.debug:
@@ -210,7 +284,8 @@ def main():
     logger.debug(args)
 
     client = OrloClient(
-        uri=args.uri
+        uri=args.uri,
+        verify_ssl=False if args.insecure else True,
     )
     args.func(client, args)
 

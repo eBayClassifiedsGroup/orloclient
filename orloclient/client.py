@@ -258,7 +258,7 @@ class OrloClient(BaseClient):
 
         return packages_list[0]
 
-    def get_packages(self, **kwargs):
+    def get_packages(self, raw=False, **kwargs):
         """
         Fetch packages from the orlo API with filters
 
@@ -266,10 +266,6 @@ class OrloClient(BaseClient):
         :param kwargs: Filters to apply
         """
         logger.debug("Entering get_packages")
-
-        if len(kwargs) is 0:
-            msg = "Must specify at least one filter for packages"
-            raise ClientError(msg)
 
         url = "{url}/packages".format(url=self.uri)
 
@@ -287,12 +283,15 @@ class OrloClient(BaseClient):
         logger.debug(response)
 
         response_dict = self._expect_200_json_response(response)
-        packages_list = [
-            Package(None, p['id'], p['name'], p['version'])
-            for p in response_dict['packages']
-        ]
 
-        return packages_list
+        if raw:
+            return response_dict['packages']
+        else:
+            return [
+                Package(None, p['id'], p['name'], p['version'])
+                for p in response_dict['packages']
+            ]
+
 
     def package_start(self, package):
         """
@@ -385,7 +384,8 @@ class OrloClient(BaseClient):
         )
         return self._expect_200_json_response(response)
 
-    def get_stats(self, field=None, name=None, platform=None, stime=None, ftime=None):
+    def get_stats(self, field=None, name=None, platform=None,
+                  stime=None, ftime=None):
         """
         Fetch from the /stats endpoint
 
@@ -414,13 +414,16 @@ class OrloClient(BaseClient):
         )
         return self._expect_200_json_response(response)
 
-    def get_versions(self):
+    def get_versions(self, platform=None):
         """
         Return a JSON document of all package versions
 
         :return:
         """
-        url = "{url}/info/packages/versions".format(url=self.uri)
+        url = "{url}/info/packages/versions{platform}".format(
+            url=self.uri,
+            platform=platform if platform else ''
+        )
 
         response = self._get(url)
         logger.debug(response)
