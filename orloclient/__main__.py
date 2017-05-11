@@ -24,6 +24,7 @@ logger.setLevel(logging.INFO)
 config = ConfigParser()
 config.add_section('client')
 config.set('client', 'uri', 'http://localhost:5000')
+config.set('client', 'verify_ssl', 'true')
 config.read([
     '/etc/orlo/orlo.ini',
     expanduser('~/.orlo.ini'),
@@ -129,6 +130,10 @@ def main():
                         help="Address of orlo server")
     parser.add_argument('--debug', '-d', help='Enable debug logging',
                         action='store_true')
+    parser.add_argument(
+        '--insecure', '-I', action='store_true',
+        default=False if config.getboolean('client', 'verify_ssl') else True,
+        help='Do not verify SSL/TLS connections')
 
     subparsers = parser.add_subparsers(dest='object')
     pp_package = argparse.ArgumentParser(add_help=False)
@@ -210,7 +215,8 @@ def main():
     logger.debug(args)
 
     client = OrloClient(
-        uri=args.uri
+        uri=args.uri,
+        verify_ssl=False if args.insecure else True,
     )
     args.func(client, args)
 
