@@ -101,7 +101,7 @@ def action_stop(client, args):
     ))
 
 
-def action_list_releases(client, args):
+def action_list(client, args):
     logger.debug('Filters: {}'.format(str(args.filter)))
     kwargs = {}
 
@@ -113,12 +113,15 @@ def action_list_releases(client, args):
         kwargs[l[0]] = l[1]
 
 
-    releases = client.get_releases(raw=True, **kwargs)
+    if args.packages:
+        out = client.get_packages(raw=True, **kwargs)
+    else:
+        out = client.get_releases(raw=True, **kwargs)
 
     if args.id_only:
-        print(json.dumps([r['id'] for r in releases], indent=2))
+        print(json.dumps([item['id'] for item in out], indent=2))
     else:
-        print(json.dumps(releases, indent=2))
+        print(json.dumps(out, indent=2))
 
 
 def action_stats(client, args):
@@ -197,6 +200,11 @@ def main():
              "for valid parameters"
     )
     pp_list.add_argument(
+        '-p', '--packages', action='store_true',
+        help="By default we list releases, this switches to listing "
+             "packages instead"
+    )
+    pp_list.add_argument(
         '-i', '--id-only', action='store_true',
        help="Only print id values, not full release json"
     )
@@ -256,7 +264,7 @@ def main():
     subparsers.add_parser(
         'list', help='List releases, filters optional',
         parents=[pp_list]
-    ).set_defaults(func=action_list_releases)
+    ).set_defaults(func=action_list)
     subparsers.add_parser(
         'stats', help='Fetch release stats',
         parents=[pp_stats]
