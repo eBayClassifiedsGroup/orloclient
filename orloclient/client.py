@@ -385,7 +385,8 @@ class OrloClient(BaseClient):
         )
         return self._expect_200_json_response(response)
 
-    def get_stats(self, field=None, name=None, platform=None, stime=None, ftime=None):
+    def get_stats(self, field=None, name=None, platform=None,
+                  stime=None, ftime=None):
         """
         Fetch from the /stats endpoint
 

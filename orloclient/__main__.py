@@ -121,6 +121,17 @@ def action_list_releases(client, args):
         print(json.dumps(releases, indent=2))
 
 
+def action_stats(client, args):
+    out = client.get_stats(
+        field=args.field,
+        name=args.name,
+        platform=args.platform,
+        stime=args.time_after,
+        ftime=args.time_before,
+    )
+    print(json.dumps(out, indent=2))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', '-v', action='version',
@@ -176,6 +187,19 @@ def main():
        help="Only print id values, not full release json"
     )
 
+    pp_stats = argparse.ArgumentParser(add_help=False)
+    pp_stats.add_argument('--field', help='Field to report on',
+                          choices=('user', 'team', 'package', 'platform'))
+    pp_stats.add_argument('--name', help='The subject or field entry, e.g if '
+                                         'field is user, name could be "alex"')
+    pp_stats.add_argument('--platform', help='Platform to filter on.')
+    pp_stats.add_argument('--time-before', metavar='TIME',
+                          help='Filter by releases started before this time')
+    pp_stats.add_argument('--time-after', metavar='TIME',
+                          help='Filter by releases started after this time'
+                          '(both time-before and time-after filter on the '
+                          '"stime" [start time] field).')
+
     pp_create_package = argparse.ArgumentParser(add_help=False)
     pp_create_package.add_argument('name', help='Package name')
     pp_create_package.add_argument('version', help='Package version')
@@ -208,6 +232,10 @@ def main():
         'list', help='List releases, filters optional',
         parents=[pp_list]
     ).set_defaults(func=action_list_releases)
+    subparsers.add_parser(
+        'stats', help='Fetch release stats',
+        parents=[pp_stats]
+    ).set_defaults(func=action_stats)
 
     args = parser.parse_args()
     if args.debug:
